@@ -37,4 +37,12 @@ Labels:
 
 ## Status
 
-In progress
+First working version completed.
+
+The project can:
+- load and prepare the dataset
+- split data into train and test sets
+- convert SMS messages into numerical features using TF-IDF
+- train a Naive Bayes model
+- evaluate the model using accuracy, precision, recall and confusion matrix
+- test custom messages
