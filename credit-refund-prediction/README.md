@@ -57,8 +57,7 @@ Features include:
 * Confusion Matrix
 
 ## Status
-
-In progress.
+Completed.
 
 The project can:
 
