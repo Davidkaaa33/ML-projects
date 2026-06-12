@@ -36,8 +36,7 @@ Labels:
 - Confusion Matrix
 
 ## Status
-
-First working version completed.
+Completed.
 
 The project can:
 - load and prepare the dataset
