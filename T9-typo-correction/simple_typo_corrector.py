@@ -6,7 +6,7 @@ pd.set_option("display.width", 1000)
 pd.set_option("display.max_rows", 100)
 
 
-df = pd.read_csv('data/t9_advanced_typo_correction_dataset.csv')
+df = pd.read_csv('data/t9_typo_correction_dataset.csv')
 correct_words = df['correct_word'].unique().tolist()
 
 def suggest_correction(word, candidates = correct_words, n = 5, cutoff = 0.7):
