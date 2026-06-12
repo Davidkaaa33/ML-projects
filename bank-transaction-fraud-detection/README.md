@@ -57,7 +57,7 @@ Features:
 - Confusion Matrix
 
 ## Status
-In progress.
+Completed.
 
 The project can:
 - load and prepare the transaction dataset
