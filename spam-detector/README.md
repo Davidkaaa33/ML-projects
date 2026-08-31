@@ -2,28 +2,28 @@
 
 ## Dataset
 
-The included `data/spam.csv` is the SMS Spam Collection dataset with 5,572 messages: 4,825 ham and 747 spam.
+The included `data/spam.csv` is the SMS Spam Collection dataset with 5,572 rows. After exact-message deduplication, 5,169 messages remain: 4,516 ham and 653 spam.
 
 ## Approach
 
-A stratified 80/20 train/test split is used with `random_state=42`. One sklearn Pipeline fits `TfidfVectorizer` followed by `MultinomialNB`, so training, saved-model inference, and the API all use identical text preprocessing.
+Exact duplicate messages are removed before splitting so identical samples cannot appear in both train and test. A stratified 80/20 train/test split is used with `random_state=42`. One sklearn Pipeline fits `TfidfVectorizer` followed by `MultinomialNB`, so training, saved-model inference, and the API all use identical text preprocessing.
 
 ## Results
 
 | Test metric | Value |
 |---|---:|
 | Precision | 1.0000 |
-| Recall | 0.7047 |
-| F1 | 0.8268 |
+| Recall | 0.6183 |
+| F1 | 0.7642 |
 
 Confusion matrix, with actual classes as rows and predicted classes as columns:
 
 |  | Predicted ham | Predicted spam |
 |---|---:|---:|
-| Actual ham | 966 | 0 |
-| Actual spam | 44 | 105 |
+| Actual ham | 903 | 0 |
+| Actual spam | 50 | 81 |
 
-The error-analysis dataframes contain 0 false positives and 44 false negatives. Printed false negatives include promotional subscription, dating-service, voucher, and premium-rate-call messages. This describes the observed errors without assuming a cause that the examples do not establish.
+The error-analysis dataframes contain 0 false positives and 50 false negatives. Printed false negatives include adult-service, karaoke, ringtone, and premium-rate messages. This describes the observed errors without assuming a cause that the examples do not establish.
 
 ## Train and inspect errors
 
