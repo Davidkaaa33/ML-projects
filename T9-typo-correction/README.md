@@ -1,68 +1,45 @@
 # T9 Typo Correction
 
-A beginner-to-intermediate NLP and ML project for **correcting typos** and predicting the **type of typo** in words.
-
----
+This project separates correction candidate ranking from typo-type classification.
 
 ## Dataset
 
-This project uses the **synthetic T9 typo correction dataset**.  
+The included synthetic dataset is `data/t9_typo_correction_dataset.csv` with 1,647 typo/correction pairs. It contains five typo types: replacement, deletion, insertion near the ending, last-two-letter swap, and no typo.
 
-Columns:
+## Inference sequence
 
-- `typo_word` — the misspelled word  
-- `correct_word` — the correct word  
-- `typo_type` — type of typo: `replace_last_letter`, `delete_last_letter`, `swap_last_two_letters`, `insert_near_ending`, `no_typo`  
-- `mistake_position` — where the typo occurs (`last1`, `last2`, `last3`, `none`)  
-- `edit_distance` — number of edits between typo and correct word  
-- `word_length` — length of the correct word  
-- `typo_length` — length of the typo word  
-- `length_difference` — difference between correct word length and typo length  
-- `same_first_letter` — 1 if first letters match, 0 otherwise  
-- `is_last_letter_error` — 1 if typo occurs in last letters, 0 otherwise  
+```text
+raw typo
+-> candidate generation from the known vocabulary
+-> edit-distance candidate ranking
+-> selected correction candidate
+-> typo/candidate feature extraction
+-> typo type classification
+```
 
-Dataset file: `data/t9_advanced_typo_correction_dataset.csv`
+`simple_typo_corrector.py` provides a `difflib` baseline. `advanced_typo_corrector.py` filters by first letter and Levenshtein distance, then ranks candidates with a small explicit score. `typo_type_classifier.py` runs only after a candidate has been selected.
 
----
+The classifier's features—edit distance, candidate and typo lengths, length difference, and first-letter match—are computed from the observed typo and selected candidate. It no longer reads the dataset's precomputed ground-truth-relative fields during inference.
 
-## Technologies
+## Results
 
-- Python
-- pandas
-- numpy
-- scikit-learn
-- python-Levenshtein
+Running candidate ranking on all 1,647 dataset rows gives:
 
----
+| Metric | Value |
+|---|---:|
+| Top-1 candidate accuracy | 0.9775 |
+| Top-3 candidate recall | 0.9982 |
 
-## Project Steps
+The typo-type classifier has test accuracy **1.0000** on a stratified 80/20 split. This is a conditional result: its evaluation supplies the known correct candidate. End-to-end type accuracy can be lower when candidate ranking selects the wrong word. The synthetic typo rules also make type labels almost directly separable by edit distance and length difference.
 
-1. Load the dataset
-2. Explore the data
-3. Create features for words (edit distance, first letter match, last-letter error, etc.)
-4. **Simple approach** — correct typos using Python `difflib`
-5. **Advanced approach** — correct typos using Levenshtein distance and candidate scoring
-6. **ML approach** — predict the type of typo using Random Forest classifier
-7. Test custom words and sentences
+## Run
 
----
+```bash
+cd T9-typo-correction
+pip install -r requirements.txt
+python simple_typo_corrector.py
+python advanced_typo_corrector.py
+python typo_type_classifier.py
+```
 
-## Metrics
-
-For the ML approach:
-
-- Accuracy
-- Precision
-- Recall
-- F1-score
-- Confusion matrix
-
----
-
-## Status
-Completed.
-
-The project can:
-- Correct typos in single words and full sentences
-- Suggest multiple candidate corrections
-- Predict the type of typo for ML-based analysis
+Candidate generation uses the vocabulary derived from the included dataset, so it cannot correct words outside that closed vocabulary.
