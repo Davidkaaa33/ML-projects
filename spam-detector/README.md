@@ -1,47 +1,54 @@
 # SMS Spam Detector
 
-A beginner machine learning project that classifies SMS messages as **spam** or **ham**.
-
 ## Dataset
 
-This project uses the **SMS Spam Collection Dataset**.
+The included `data/spam.csv` is the SMS Spam Collection dataset with 5,572 messages: 4,825 ham and 747 spam.
 
-Labels:
-- `ham` — normal message
-- `spam` — spam message
+## Approach
 
-## Technologies
+A stratified 80/20 train/test split is used with `random_state=42`. One sklearn Pipeline fits `TfidfVectorizer` followed by `MultinomialNB`, so training, saved-model inference, and the API all use identical text preprocessing.
 
-- Python
-- pandas
-- scikit-learn
-- TF-IDF
-- Naive Bayes
+## Results
 
-## Project Steps
+| Test metric | Value |
+|---|---:|
+| Precision | 1.0000 |
+| Recall | 0.7047 |
+| F1 | 0.8268 |
 
-1. Load the dataset
-2. Explore the data
-3. Split data into train and test sets
-4. Convert text to numbers using TF-IDF
-5. Train a Naive Bayes model
-6. Evaluate the model
-7. Test custom messages
+Confusion matrix, with actual classes as rows and predicted classes as columns:
 
-## Metrics
+|  | Predicted ham | Predicted spam |
+|---|---:|---:|
+| Actual ham | 966 | 0 |
+| Actual spam | 44 | 105 |
 
-- Accuracy
-- Precision
-- Recall
-- Confusion Matrix
+The error-analysis dataframes contain 0 false positives and 44 false negatives. Printed false negatives include promotional subscription, dating-service, voucher, and premium-rate-call messages. This describes the observed errors without assuming a cause that the examples do not establish.
 
-## Status
-Completed.
+## Train and inspect errors
 
-The project can:
-- load and prepare the dataset
-- split data into train and test sets
-- convert SMS messages into numerical features using TF-IDF
-- train a Naive Bayes model
-- evaluate the model using accuracy, precision, recall and confusion matrix
-- test custom messages
+```bash
+cd spam-detector
+pip install -r requirements.txt
+python train.py
+```
+
+Training prints metrics and representative false-positive/false-negative rows, then saves the complete pipeline as `model.joblib`.
+
+## Inference API
+
+```bash
+uvicorn app:app --reload
+```
+
+- `GET /health` returns `{"status": "ok"}`.
+- `POST /predict` accepts `{"text": "some SMS"}` and returns the predicted label and spam probability.
+
+Docker usage:
+
+```bash
+docker build -t spam-detector .
+docker run -p 8000:8000 spam-detector
+```
+
+The dataset is small and dated, so the measured result should not be treated as performance on current messaging traffic.
