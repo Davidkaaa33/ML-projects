@@ -17,7 +17,8 @@ MODEL_PATH = PROJECT_DIR / "model.joblib"
 
 def load_data():
     data = pd.read_csv(DATA_PATH, encoding="latin-1", usecols=["v1", "v2"])
-    return data.rename(columns={"v1": "label", "v2": "message"})
+    data = data.rename(columns={"v1": "label", "v2": "message"})
+    return data.drop_duplicates(subset="message").reset_index(drop=True)
 
 
 def build_pipeline():
@@ -51,6 +52,7 @@ def train_and_evaluate():
         random_state=RANDOM_STATE,
         stratify=data["label"],
     )
+    assert set(X_train).isdisjoint(set(X_test))
 
     pipeline = build_pipeline()
     pipeline.fit(X_train, y_train)
