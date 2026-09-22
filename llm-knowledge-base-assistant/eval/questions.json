@@ -1,0 +1,109 @@
+[
+  {
+    "id": 1,
+    "question": "How much annual leave does staff receive?",
+    "answerable": true,
+    "expected_answer": "28 calendar days per year",
+    "relevant_chunks": ["company_policy.txt:0"]
+  },
+  {
+    "id": 2,
+    "question": "How many days per week can I work remotely?",
+    "answerable": true,
+    "expected_answer": "Three days",
+    "relevant_chunks": ["company_policy.txt:0"]
+  },
+  {
+    "id": 3,
+    "question": "How far in advance must I request vacation?",
+    "answerable": true,
+    "expected_answer": "At least two weeks",
+    "relevant_chunks": [
+      "company_policy.txt:0",
+      "company_policy.txt:1"
+    ]
+  },
+  {
+    "id": 4,
+    "question": "Does the company provide work equipment?",
+    "answerable": true,
+    "expected_answer": "Yes, laptops and other required equipment",
+    "relevant_chunks": ["company_policy.txt:1"]
+  },
+  {
+    "id": 5,
+    "question": "What is the internal AI assistant called?",
+    "answerable": true,
+    "expected_answer": "KnowledgeAI",
+    "relevant_chunks": ["ai_service.txt:0"]
+  },
+  {
+    "id": 6,
+    "question": "What information does KnowledgeAI use?",
+    "answerable": true,
+    "expected_answer": "Internal company documentation",
+    "relevant_chunks": ["ai_service.txt:0"]
+  },
+  {
+    "id": 7,
+    "question": "How does KnowledgeAI find relevant information?",
+    "answerable": true,
+    "expected_answer": "Retrieval augmented generation",
+    "relevant_chunks": [
+      "ai_service.txt:0",
+      "ai_service.txt:1"
+    ]
+  },
+  {
+    "id": 8,
+    "question": "How can employees access the AI assistant?",
+    "answerable": true,
+    "expected_answer": "Through a web interface",
+    "relevant_chunks": ["ai_service.txt:1"]
+  },
+  {
+    "id": 9,
+    "question": "What are the technical support hours?",
+    "answerable": true,
+    "expected_answer": "09:00 to 18:00 on business days",
+    "relevant_chunks": ["support.txt:0"]
+  },
+  {
+    "id": 10,
+    "question": "Where should critical incidents be reported?",
+    "answerable": true,
+    "expected_answer": "The internal support portal",
+    "relevant_chunks": [
+      "support.txt:0",
+      "support.txt:1"
+    ]
+  },
+  {
+    "id": 11,
+    "question": "What details are required when reporting an AI service incident?",
+    "answerable": true,
+    "expected_answer": "User request, error message and approximate incident time",
+    "relevant_chunks": ["support.txt:1"]
+  },
+  {
+    "id": 12,
+    "question": "Who is the company's CEO?",
+    "answerable": false,
+    "expected_answer": null,
+    "relevant_chunks": []
+  },
+  {
+    "id": 13,
+    "question": "What is the average employee salary?",
+    "answerable": false,
+    "expected_answer": null,
+    "relevant_chunks": []
+  },
+  {
+    "id": 14,
+    "question": "How many paid sick leave days are available?",
+    "answerable": false,
+    "expected_answer": null,
+    "relevant_chunks": []
+  }
+]

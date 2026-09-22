@@ -9,4 +9,6 @@ A portfolio of machine learning projects covering tabular classification, imbala
 | [SMS Spam Detector](spam-detector/) | Classify SMS as spam or ham | TF-IDF, Multinomial Naive Bayes, FastAPI | Test precision 1.0000, recall 0.6183, F1 0.7642 |
 | [T9 Typo Correction](T9-typo-correction/) | Generate and rank word corrections, then classify typo type | Edit distance, candidate scoring, Random Forest | Candidate top-1 accuracy 0.9775; conditional typo-type accuracy 1.0000 |
 
+| [LLM Knowledge Base Assistant](llm-knowledge-base-assistant/) | Answer questions from internal documents with local RAG | SentenceTransformers, FAISS, Qwen, Ollama, FastAPI, Docker | Hit@1 81.82%, Hit@3 100%, MRR@3 0.9091 |
+
 The tabular datasets and the T9 dataset are synthetic. The spam project uses the SMS Spam Collection dataset included in its project folder. See each project README for its validation design, limitations, and run commands.

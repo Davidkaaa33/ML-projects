@@ -1,0 +1,8 @@
+The company provides an internal AI assistant called KnowledgeAI.
+
+KnowledgeAI answers employee questions using internal company documentation.
+
+The assistant uses retrieval augmented generation to find relevant information before generating an answer.
+
+The AI service is available through a web interface.
+

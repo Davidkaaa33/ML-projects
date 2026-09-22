@@ -1,0 +1,7 @@
+pypdf
+sentence-transformers
+faiss-cpu
+ollama
+
+fastapi
+uvicorn[standard]

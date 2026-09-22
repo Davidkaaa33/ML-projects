@@ -1,0 +1,5 @@
+Technical support is available from 09:00 to 18:00 on business days.
+
+Critical incidents must be reported through the internal support portal.
+
+AI service incident reports should include the user request, error message and approximate time of the incident.
