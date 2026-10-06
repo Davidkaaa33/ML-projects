@@ -4,6 +4,10 @@ A compact portfolio of end-to-end ML work across tabular modeling, NLP, typo cor
 
 Each project includes a reproducible training/evaluation path, reported metrics and explicit limitations.
 
+**5 projects · tests in every project · 2 API services · 1 local RAG system**
+
+> **Featured external project:** [Avito Candidate Retrieval](https://github.com/Davidkaaa33/avito-ds-bootcamp-2026-solution) — hybrid BM25 + BGE-M3 + geographic/microcategory retrieval with **Recall@50 0.831562**.
+
 | Project | Focus | Methods | Result |
 | --- | --- | --- | --- |
 | [Bank Transaction Fraud Detection](bank-transaction-fraud-detection/) | imbalanced classification | feature engineering · Logistic Regression · Random Forest · threshold tuning | ROC-AUC **0.8713** · PR-AUC **0.3399** |
