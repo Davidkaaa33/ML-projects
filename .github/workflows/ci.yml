@@ -150,6 +150,40 @@ jobs:
         working-directory: llm-knowledge-base-assistant
         run: python -m pytest -q tests
 
+  spam-container:
+    name: Spam API container smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Build image
+        run: docker build -t spam-detector-ci ./spam-detector
+
+      - name: Start container
+        run: docker run -d --rm --name spam-detector-ci -p 8000:8000 spam-detector-ci
+
+      - name: Wait for health endpoint
+        run: |
+          for attempt in {1..20}; do
+            if curl --fail --silent http://127.0.0.1:8000/health; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs spam-detector-ci
+          exit 1
+
+      - name: Smoke prediction
+        run: |
+          curl --fail --silent             -H "Content-Type: application/json"             -d '{"text":"Call me when you arrive"}'             http://127.0.0.1:8000/predict | python -m json.tool
+
+      - name: Container logs
+        if: always()
+        run: docker logs spam-detector-ci || true
+
   dependency-audit:
     name: Dependency audit
     runs-on: ubuntu-latest
