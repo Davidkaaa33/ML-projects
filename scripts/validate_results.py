@@ -66,31 +66,17 @@ def main():
 
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     expected_fragments = [
-        (
-            "fraud headline metrics",
-            f'ROC-AUC **{fraud["test_metrics"]["roc_auc"]:.4f}** · '
-            f'PR-AUC **{fraud["test_metrics"]["pr_auc"]:.4f}**',
-        ),
-        (
-            "credit headline metrics",
-            f'ROC-AUC **{credit["test_metrics"]["roc_auc"]:.4f}** · '
-            f'F1 **{credit["test_metrics"]["f1"]:.4f}**',
-        ),
-        (
-            "spam headline metrics",
-            f'Precision **{spam["test_metrics"]["precision"]:.4f}** · '
-            f'F1 **{spam["test_metrics"]["f1"]:.4f}**',
-        ),
-        (
-            "T9 headline metrics",
-            f'Top-1 **{t9_rank["metrics"]["top_1_accuracy"]:.4f}** · '
-            f'Top-3 **{t9_rank["metrics"]["top_3_recall"]:.4f}**',
-        ),
-        (
-            "RAG headline metrics",
-            f'Hit@1 **{rag["hit_at_1"]:.2%}** · '
-            f'MRR@3 **{rag["mrr_at_3"]:.4f}**',
-        ),
+        ("fraud ROC-AUC", f'ROC-AUC **{fraud["test_metrics"]["roc_auc"]:.4f}**'),
+        ("fraud PR-AUC", f'PR-AUC **{fraud["test_metrics"]["pr_auc"]:.4f}**'),
+        ("credit ROC-AUC", f'ROC-AUC **{credit["test_metrics"]["roc_auc"]:.4f}**'),
+        ("credit F1", f'F1 **{credit["test_metrics"]["f1"]:.4f}**'),
+        ("spam precision", f'Precision **{spam["test_metrics"]["precision"]:.4f}**'),
+        ("spam F1", f'F1 **{spam["test_metrics"]["f1"]:.4f}**'),
+        ("T9 Top-1", f'Top-1 **{t9_rank["metrics"]["top_1_accuracy"]:.4f}**'),
+        ("T9 Top-3", f'Top-3 **{t9_rank["metrics"]["top_3_recall"]:.4f}**'),
+        ("RAG Hit@1", f'Hit@1 **{rag["hit_at_1"]:.2%}**'),
+        ("RAG Hit@3", f'Hit@3 **{rag["hit_at_3"]:.0%}**'),
+        ("RAG MRR@3", f'MRR@3 **{rag["mrr_at_3"]:.4f}**'),
     ]
 
     for name, fragment in expected_fragments:
