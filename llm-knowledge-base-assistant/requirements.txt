@@ -6,4 +6,4 @@ ollama==0.6.3
 httpx==0.28.1
 fastapi==0.142.2
 pydantic==2.13.5
-uvicorn[standard]==0.53.0
+uvicorn[standard]==0.54.0
