@@ -8,7 +8,7 @@
   "threshold": 0.6134638786315918,
   "balanced_accuracy": 0.9090909090909092,
   "answerable_recall": 0.8181818181818182,
-  "unanswerable_recall": 1,
+  "unanswerable_recall": 1.0,
   "records": [
     {
       "id": 1,
