@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "generated_by": "train.py",
+  "provenance": "Committed snapshot of the documented reproducible run; regenerate by executing train.py.",
+  "dataset": {
+    "path": "data/spam.csv",
+    "deduplicate_exact_messages": true
+  },
+  "split": {
+    "train": 0.8,
+    "test": 0.2,
+    "stratified": true,
+    "random_state": 42
+  },
+  "model": "TfidfVectorizer + MultinomialNB",
+  "test_metrics": {
+    "precision": 1.0,
+    "recall": 0.6183,
+    "f1": 0.7642
+  },
+  "confusion_matrix": {
+    "labels": ["ham", "spam"],
+    "values": [[903, 0], [50, 81]]
+  },
+  "error_counts": {
+    "false_positives": 0,
+    "false_negatives": 50
+  }
+}
