@@ -44,6 +44,8 @@ The final model is Random Forest with `max_depth=8`, `min_samples_leaf=4`, and n
 
 PR-AUC shows how well the model ranks rare fraud cases under class imbalance. Precision describes the share of alerts that are fraud, while recall describes the share of fraud cases caught; together they expose the operational trade-off hidden by accuracy.
 
+Machine-readable evaluation snapshot: [`artifacts/results.json`](artifacts/results.json). Running `fraud_detection.py` regenerates the artifact.
+
 ## Run
 
 ```bash
