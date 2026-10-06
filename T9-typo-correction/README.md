@@ -32,6 +32,8 @@ Running candidate ranking on all 1,647 dataset rows gives:
 
 The typo-type classifier has test accuracy **1.0000** on a stratified 80/20 split. This is a conditional result: its evaluation supplies the known correct candidate. End-to-end type accuracy can be lower when candidate ranking selects the wrong word. The synthetic typo rules also make type labels almost directly separable by edit distance and length difference.
 
+Machine-readable snapshots: [`artifacts/candidate_results.json`](artifacts/candidate_results.json) and [`artifacts/classifier_results.json`](artifacts/classifier_results.json). The corresponding scripts regenerate them.
+
 ## Run
 
 ```bash
