@@ -19,10 +19,18 @@ def calculate_score(typo_word, candidate_word):
 
 
 def suggest_correction(typo_word, candidate_words, top_n=3):
-    typo_word = typo_word.lower()
+    typo_word = typo_word.strip().lower()
+    if not typo_word or top_n <= 0:
+        return []
+
+    normalized_candidates = [
+        word.lower()
+        for word in candidate_words
+        if isinstance(word, str) and word
+    ]
     candidates = [
         word
-        for word in candidate_words
+        for word in normalized_candidates
         if word[0] == typo_word[0] and Levenshtein.distance(typo_word, word) <= 2
     ]
     scored_candidates = [
