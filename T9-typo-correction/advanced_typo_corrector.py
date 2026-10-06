@@ -1,10 +1,13 @@
+import json
 from pathlib import Path
 
 import Levenshtein
 import pandas as pd
 
 
-DATA_PATH = Path(__file__).parent / "data" / "t9_typo_correction_dataset.csv"
+PROJECT_DIR = Path(__file__).parent
+DATA_PATH = PROJECT_DIR / "data" / "t9_typo_correction_dataset.csv"
+RESULTS_PATH = PROJECT_DIR / "artifacts" / "candidate_results.json"
 
 
 def calculate_score(typo_word, candidate_word):
@@ -70,6 +73,26 @@ def main():
     print("Candidate ranking metrics:")
     for metric, value in metrics.items():
         print(f"{metric}: {value:.4f}")
+
+    RESULTS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    RESULTS_PATH.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "generated_by": "advanced_typo_corrector.py",
+                "dataset": {
+                    "path": "data/t9_typo_correction_dataset.csv",
+                    "synthetic": True,
+                    "rows": int(len(data)),
+                },
+                "candidate_source": "closed vocabulary from dataset",
+                "metrics": {key: float(value) for key, value in metrics.items()},
+            },
+            indent=2,
+        ) + "\n",
+        encoding="utf-8",
+    )
+    print(f"Saved metrics to {RESULTS_PATH}")
 
     sentence = "I am lerning pythom with hella fun"
     print("Original:", sentence)
