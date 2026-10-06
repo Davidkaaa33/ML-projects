@@ -1,0 +1,9 @@
+.git/
+.github/
+**/.venv/
+**/__pycache__/
+**/.pytest_cache/
+**/*.pyc
+apps/web/node_modules/
+apps/web/dist/
+.DS_Store
