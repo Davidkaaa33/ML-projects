@@ -1,7 +1,9 @@
-pypdf
-sentence-transformers
-faiss-cpu
-ollama
-
-fastapi
-uvicorn[standard]
+numpy==2.3.2
+pypdf==6.19.0
+sentence-transformers==6.1.0
+faiss-cpu==1.15.1
+ollama==0.6.3
+httpx==0.28.1
+fastapi==0.142.2
+pydantic==2.13.5
+uvicorn[standard]==0.53.0
