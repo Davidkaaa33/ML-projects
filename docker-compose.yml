@@ -1,0 +1,30 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      WEB_ORIGINS: http://localhost:8080
+      RAG_SERVICE_URL: http://rag:8000
+    expose:
+      - "8000"
+
+  web:
+    build:
+      context: ./apps/web
+    ports:
+      - "8080:80"
+    depends_on:
+      - api
+
+  rag:
+    profiles: ["rag"]
+    build:
+      context: ./llm-knowledge-base-assistant
+    environment:
+      OLLAMA_HOST: http://host.docker.internal:11434
+      OLLAMA_MODEL: qwen3.5:4b
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    expose:
+      - "8000"
