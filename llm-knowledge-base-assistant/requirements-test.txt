@@ -1,4 +1,4 @@
-numpy==2.3.2
+numpy==2.5.3
 pypdf==6.19.0
 faiss-cpu==1.15.1
 ollama==0.6.3
