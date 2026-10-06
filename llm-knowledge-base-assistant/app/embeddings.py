@@ -1,5 +1,3 @@
-from sentence_transformers import SentenceTransformer
-
 from app.chunking import Chunk
 
 
@@ -8,6 +6,10 @@ MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 
 class EmbeddingModel:
     def __init__(self):
+        # Keep model loading out of module import so API/unit tests can use
+        # mocked assistants without downloading a transformer model.
+        from sentence_transformers import SentenceTransformer
+
         self.model = SentenceTransformer(MODEL_NAME)
 
     def encode_chunks(self, chunks: list[Chunk]):
