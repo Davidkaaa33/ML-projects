@@ -6,7 +6,7 @@ The system keeps retrieval and generation local: SentenceTransformers produce em
 
 | | |
 | --- | --- |
-| **Retrieval** | SentenceTransformer embeddings + FAISS |
+| **Retrieval** | SentenceTransformer embeddings + FAISS · pinned model revision |
 | **Generation** | Qwen via local Ollama |
 | **Serving** | FastAPI |
 | **Documents** | TXT / PDF |
@@ -52,7 +52,7 @@ flowchart LR
 
 ## Evaluation
 
-The repository includes a small labeled question set under `eval/questions.json` and separate scripts for retrieval quality, generated-answer evaluation and citation auditing.
+The repository includes a small labeled question set under `eval/questions.json` and separate scripts for retrieval quality, generated-answer evaluation and citation auditing. The embedding model is pinned to an immutable Hugging Face revision so committed retrieval metrics can be reproduced instead of following a moving `main` branch.
 
 Reported retrieval metrics (snapshot: [`eval/results.json`](eval/results.json)):
 
