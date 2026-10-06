@@ -38,8 +38,39 @@ def test_health_endpoint():
 
 
 def test_prediction_response():
-    response = client.post("/predict", json={"text": "Call me when you arrive"})
+    response = client.post(
+        "/predict",
+        json={"text": "Call me when you arrive"},
+    )
     body = response.json()
+
     assert response.status_code == 200
     assert body["label"] in {"ham", "spam"}
     assert 0 <= body["spam_probability"] <= 1
+
+
+def test_prediction_strips_surrounding_whitespace():
+    response = client.post(
+        "/predict",
+        json={"text": "   Call me when you arrive   "},
+    )
+
+    assert response.status_code == 200
+
+
+def test_empty_message_is_rejected():
+    response = client.post(
+        "/predict",
+        json={"text": "   "},
+    )
+
+    assert response.status_code == 422
+
+
+def test_oversized_message_is_rejected():
+    response = client.post(
+        "/predict",
+        json={"text": "x" * 5001},
+    )
+
+    assert response.status_code == 422
