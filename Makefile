@@ -29,10 +29,10 @@ test-rag:
 	cd llm-knowledge-base-assistant && $(PYTHON) -m pytest -q tests
 
 rag-calibrate:
-	cd llm-knowledge-base-assistant && $(PYTHON) eval/calibrate_abstention.py
+	cd llm-knowledge-base-assistant && PYTHONPATH=. $(PYTHON) eval/calibrate_abstention.py
 
 rag-eval:
-	cd llm-knowledge-base-assistant && $(PYTHON) eval/evaluate_retrieval.py
+	cd llm-knowledge-base-assistant && PYTHONPATH=. $(PYTHON) eval/evaluate_retrieval.py
 
 check: lint validate-artifacts
 	$(PYTHON) -m compileall -q 		bank-transaction-fraud-detection 		credit-repayment-prediction 		spam-detector 		T9-typo-correction 		llm-knowledge-base-assistant/app 		llm-knowledge-base-assistant/eval
