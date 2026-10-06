@@ -4,6 +4,8 @@ from typing import Any
 import httpx
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from pathlib import Path
 from pydantic import BaseModel, Field, field_validator
 
 from app.services import (
@@ -165,3 +167,12 @@ async def rag_ask(payload: RAGRequest):
             status_code=503,
             detail="RAG service is configured but unavailable.",
         ) from exc
+
+
+WEB_DIST = Path(__file__).resolve().parents[2] / "web" / "dist"
+if WEB_DIST.exists():
+    app.mount(
+        "/",
+        StaticFiles(directory=WEB_DIST, html=True),
+        name="web",
+    )
