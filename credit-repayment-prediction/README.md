@@ -40,6 +40,8 @@ The ten highest Random Forest importances are:
 
 Importances describe how much the fitted forest used each feature; they do not establish causal effects.
 
+Machine-readable evaluation snapshot: [`artifacts/results.json`](artifacts/results.json). Running `train.py` regenerates the artifact.
+
 ## Run
 
 ```bash
