@@ -51,7 +51,8 @@ jobs:
         run: PYTHONPATH=. python eval/calibrate_abstention.py
 
       - name: Verify committed evaluation snapshot
-        run: git diff --exit-code -- llm-knowledge-base-assistant/eval/results.json llm-knowledge-base-assistant/eval/threshold.json
+        working-directory: llm-knowledge-base-assistant
+        run: PYTHONPATH=. python eval/verify_snapshot.py
 
       - name: Show generated evaluation artifacts
         working-directory: llm-knowledge-base-assistant
