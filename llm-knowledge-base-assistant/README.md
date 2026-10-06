@@ -1,23 +1,104 @@
 # LLM Knowledge Base Assistant
 
-A local Retrieval-Augmented Generation (RAG) service for answering questions using internal documents.
+**A local Retrieval-Augmented Generation service for answering questions from internal TXT/PDF documents.**
 
-The system retrieves relevant document chunks using SentenceTransformers and FAISS, then generates a grounded answer with a locally hosted Qwen model through Ollama.
+The system keeps retrieval and generation local: SentenceTransformers produce embeddings, FAISS performs vector search, and a Qwen model is served through Ollama. The API returns grounded answers with source citations; no paid LLM API is required.
 
-No paid LLM API is required.
+| | |
+| --- | --- |
+| **Retrieval** | SentenceTransformer embeddings + FAISS |
+| **Generation** | Qwen via local Ollama |
+| **Serving** | FastAPI |
+| **Documents** | TXT / PDF |
+| **Evaluation** | retrieval metrics + answer evaluation + citation audit |
+| **Packaging** | Docker |
+| **Reported retrieval** | Hit@1 **81.82%** · Hit@3 **100%** · MRR@3 **0.9091** |
 
 ## Architecture
 
 ```mermaid
-flowchart TD
-    A[TXT / PDF Documents] --> B[Document Ingestion]
-    B --> C[Sentence-aware Chunking]
-    C --> D[SentenceTransformer Embeddings]
-    D --> E[FAISS Vector Index]
+flowchart LR
+    DOC[TXT / PDF documents] --> ING[Ingestion]
+    ING --> CHUNK[Sentence-aware chunking]
+    CHUNK --> EMB[SentenceTransformer embeddings]
+    EMB --> IDX[(FAISS index)]
 
-    Q[User Question] --> F[Query Embedding]
-    F --> E
-    E --> G[Top-K Relevant Chunks]
-    G --> H[Prompt + Retrieved Context]
-    H --> I[Qwen 3.5 4B via Ollama]
-    I --> J[Grounded Answer + Citations]
+    Q[User question] --> QEMB[Query embedding]
+    QEMB --> IDX
+    IDX --> RET[Top-k chunks]
+    RET --> PROMPT[Prompt + retrieved context]
+    PROMPT --> LLM[Qwen via Ollama]
+    LLM --> ANS[Grounded answer + citations]
+```
+
+## Repository structure
+
+| Path | Purpose |
+| --- | --- |
+| `app/ingestion.py` | TXT/PDF document loading |
+| `app/chunking.py` | sentence-aware text chunking |
+| `app/embeddings.py` | embedding model integration |
+| `app/vector_store.py` | FAISS index persistence/search |
+| `app/retrieval.py`, `app/search.py` | retrieval flow |
+| `app/rag.py` | retrieval + generation orchestration |
+| `app/llm.py` | local Ollama/Qwen generation |
+| `app/api.py` | FastAPI service |
+| `eval/` | retrieval evaluation, answer evaluation and citation auditing |
+| `tests/` | API, ingestion/chunking and vector-store tests |
+| `Dockerfile` | containerized service |
+
+## Evaluation
+
+The repository includes a small labeled question set under `eval/questions.json` and separate scripts for retrieval quality, generated-answer evaluation and citation auditing.
+
+Reported retrieval metrics:
+
+| Metric | Value |
+| --- | ---: |
+| Hit@1 | **81.82%** |
+| Hit@3 | **100%** |
+| MRR@3 | **0.9091** |
+
+These numbers describe the included evaluation set; they are not presented as a general production benchmark.
+
+## Run locally
+
+Install Python dependencies:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+Install and start Ollama separately, then make the configured Qwen model available locally.
+
+Build the document index:
+
+```bash
+python -m app.build_index
+```
+
+Run the API:
+
+```bash
+uvicorn app.api:app --reload
+```
+
+Development/test dependencies are listed separately:
+
+```bash
+pip install -r requirements-dev.txt
+pytest
+```
+
+## Design choices
+
+- **Local-first inference** keeps document context off third-party hosted LLM APIs.
+- **Retrieval is evaluated independently** from answer generation, so retrieval failures are not hidden behind fluent output.
+- **Citations are audited separately**, making grounding a measurable concern rather than a prompt-only claim.
+- **Chunking, embeddings and vector storage are separate modules**, so retrieval components can be changed without rewriting the API surface.
+
+## Limitations
+
+The included evaluation set is intentionally small, and retrieval quality depends on the source corpus and embedding model. Local generation also depends on the available Ollama model and hardware. This project demonstrates the RAG pipeline and evaluation discipline; it does not claim broad-domain factual reliability.
