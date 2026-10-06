@@ -27,3 +27,5 @@ Each project includes a reproducible training/evaluation path, reported metrics 
 The tabular and T9 datasets are synthetic. The spam project uses the SMS Spam Collection dataset. The RAG project includes its own retrieval evaluation and citation-audit tooling.
 
 Open any project directory for the exact split design, implementation, run commands and limitations.
+
+Run the portfolio quality gates locally with `make check`; the same core checks run automatically in GitHub Actions.
