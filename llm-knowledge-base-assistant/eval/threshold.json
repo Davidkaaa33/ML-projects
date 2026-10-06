@@ -3,25 +3,96 @@
   "generated_by": "eval/calibrate_abstention.py",
   "dataset": "eval/questions.json",
   "embedding_model": "sentence-transformers/all-MiniLM-L6-v2",
+  "embedding_revision": "1110a243fdf4706b3f48f1d95db1a4f5529b4d41",
   "optimization_metric": "balanced_accuracy",
   "threshold": 0.6134638786315918,
   "balanced_accuracy": 0.9090909090909092,
   "answerable_recall": 0.8181818181818182,
-  "unanswerable_recall": 1.0,
+  "unanswerable_recall": 1,
   "records": [
-    {"id": 1, "question": "How much annual leave does staff receive?", "answerable": true, "top_score": 0.5176903605461121},
-    {"id": 2, "question": "How many days per week can I work remotely?", "answerable": true, "top_score": 0.6982648968696594},
-    {"id": 3, "question": "How far in advance must I request vacation?", "answerable": true, "top_score": 0.7822457551956177},
-    {"id": 4, "question": "Does the company provide work equipment?", "answerable": true, "top_score": 0.3144739270210266},
-    {"id": 5, "question": "What is the internal AI assistant called?", "answerable": true, "top_score": 0.6958073377609253},
-    {"id": 6, "question": "What information does KnowledgeAI use?", "answerable": true, "top_score": 0.6658879518508911},
-    {"id": 7, "question": "How does KnowledgeAI find relevant information?", "answerable": true, "top_score": 0.636569619178772},
-    {"id": 8, "question": "How can employees access the AI assistant?", "answerable": true, "top_score": 0.6504398584365845},
-    {"id": 9, "question": "What are the technical support hours?", "answerable": true, "top_score": 0.6928274631500244},
-    {"id": 10, "question": "Where should critical incidents be reported?", "answerable": true, "top_score": 0.6684233546257019},
-    {"id": 11, "question": "What details are required when reporting an AI service incident?", "answerable": true, "top_score": 0.7732390761375427},
-    {"id": 12, "question": "Who is the company's CEO?", "answerable": false, "top_score": 0.18344873189926147},
-    {"id": 13, "question": "What is the average employee salary?", "answerable": false, "top_score": 0.2996494770050049},
-    {"id": 14, "question": "How many paid sick leave days are available?", "answerable": false, "top_score": 0.5903581380844116}
+    {
+      "id": 1,
+      "question": "How much annual leave does staff receive?",
+      "answerable": true,
+      "top_score": 0.5176903605461121
+    },
+    {
+      "id": 2,
+      "question": "How many days per week can I work remotely?",
+      "answerable": true,
+      "top_score": 0.6982648968696594
+    },
+    {
+      "id": 3,
+      "question": "How far in advance must I request vacation?",
+      "answerable": true,
+      "top_score": 0.7822457551956177
+    },
+    {
+      "id": 4,
+      "question": "Does the company provide work equipment?",
+      "answerable": true,
+      "top_score": 0.3144739270210266
+    },
+    {
+      "id": 5,
+      "question": "What is the internal AI assistant called?",
+      "answerable": true,
+      "top_score": 0.6958073377609253
+    },
+    {
+      "id": 6,
+      "question": "What information does KnowledgeAI use?",
+      "answerable": true,
+      "top_score": 0.6658879518508911
+    },
+    {
+      "id": 7,
+      "question": "How does KnowledgeAI find relevant information?",
+      "answerable": true,
+      "top_score": 0.636569619178772
+    },
+    {
+      "id": 8,
+      "question": "How can employees access the AI assistant?",
+      "answerable": true,
+      "top_score": 0.6504398584365845
+    },
+    {
+      "id": 9,
+      "question": "What are the technical support hours?",
+      "answerable": true,
+      "top_score": 0.6928274631500244
+    },
+    {
+      "id": 10,
+      "question": "Where should critical incidents be reported?",
+      "answerable": true,
+      "top_score": 0.6684233546257019
+    },
+    {
+      "id": 11,
+      "question": "What details are required when reporting an AI service incident?",
+      "answerable": true,
+      "top_score": 0.7732390761375427
+    },
+    {
+      "id": 12,
+      "question": "Who is the company's CEO?",
+      "answerable": false,
+      "top_score": 0.18344873189926147
+    },
+    {
+      "id": 13,
+      "question": "What is the average employee salary?",
+      "answerable": false,
+      "top_score": 0.2996494770050049
+    },
+    {
+      "id": 14,
+      "question": "How many paid sick leave days are available?",
+      "answerable": false,
+      "top_score": 0.5903581380844116
+    }
   ]
 }
