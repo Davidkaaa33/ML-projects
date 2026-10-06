@@ -174,13 +174,19 @@ def correct_text(text: str) -> dict[str, Any]:
 
 
 @lru_cache
-def fraud_bundle():
+def fraud_data():
     module = load_module(
         "bank-transaction-fraud-detection/fraud_detection.py",
         "portfolio_fraud",
     )
-    artifact = read_json("bank-transaction-fraud-detection/artifacts/results.json")
     data = pd.read_csv(module.DATA_PATH)
+    return module, data
+
+
+@lru_cache
+def fraud_bundle():
+    module, data = fraud_data()
+    artifact = read_json("bank-transaction-fraud-detection/artifacts/results.json")
     X = data.drop(columns="is_fraud")
     y = data["is_fraud"]
 
@@ -199,7 +205,7 @@ def fraud_bundle():
 
 
 def fraud_examples() -> dict[str, Any]:
-    _, _, _, data, _ = fraud_bundle()
+    _, data = fraud_data()
     low = data[data["is_fraud"] == 0].iloc[0].drop(labels=["is_fraud"]).to_dict()
     high = data[data["is_fraud"] == 1].iloc[0].drop(labels=["is_fraud"]).to_dict()
     return {"low_risk": json_safe(low), "high_risk": json_safe(high)}
@@ -221,13 +227,19 @@ def predict_fraud(transaction: dict[str, Any]) -> dict[str, Any]:
 
 
 @lru_cache
-def credit_bundle():
+def credit_data():
     module = load_module(
         "credit-repayment-prediction/train.py",
         "portfolio_credit",
     )
-    artifact = read_json("credit-repayment-prediction/artifacts/results.json")
     data = pd.read_csv(module.DATA_PATH)
+    return module, data
+
+
+@lru_cache
+def credit_bundle():
+    module, data = credit_data()
+    artifact = read_json("credit-repayment-prediction/artifacts/results.json")
     X = data.drop(columns=["customer_id", "is_refunded"])
     y = data["is_refunded"]
 
@@ -244,7 +256,7 @@ def credit_bundle():
 
 
 def credit_examples() -> dict[str, Any]:
-    _, data, _ = credit_bundle()
+    _, data = credit_data()
     low = (
         data[data["is_refunded"] == 0]
         .iloc[0]
