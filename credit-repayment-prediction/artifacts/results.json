@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "generated_by": "train.py",
+  "provenance": "Committed snapshot of the documented reproducible run; regenerate by executing train.py.",
+  "dataset": {
+    "path": "data/credit_repayment_dataset.csv",
+    "synthetic": true
+  },
+  "split": {
+    "train": 0.6,
+    "validation": 0.2,
+    "test": 0.2,
+    "stratified": true,
+    "random_state": 42
+  },
+  "selection": {
+    "metric": "roc_auc",
+    "model": "Random Forest",
+    "configuration": "max_depth=10, min_samples_leaf=1"
+  },
+  "test_metrics": {
+    "roc_auc": 0.955,
+    "accuracy": 0.887,
+    "precision": 0.9075,
+    "recall": 0.9251,
+    "f1": 0.9162
+  }
+}
