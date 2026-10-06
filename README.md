@@ -28,4 +28,4 @@ The tabular and T9 datasets are synthetic. The spam project uses the SMS Spam Co
 
 Open any project directory for the exact split design, implementation, run commands and limitations.
 
-Run the portfolio quality gates locally with `make check`; the same core checks run automatically in GitHub Actions.
+Run the portfolio quality gates locally with `make check`; the same core checks run automatically in GitHub Actions. Direct dependencies are pinned, Dependabot checks them weekly, and project metrics are committed as machine-readable artifacts where applicable.
