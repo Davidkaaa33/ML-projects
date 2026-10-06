@@ -124,8 +124,9 @@ def evaluate(selected_ids=None):
         latency = time.perf_counter() - start
         answer = response["answer"]
 
-        abstained = (
-            ABSTENTION in answer.lower()
+        abstained = response.get(
+            "abstained",
+            ABSTENTION in answer.lower(),
         )
 
         if item["answerable"]:
@@ -157,6 +158,8 @@ def evaluate(selected_ids=None):
             "generated_answer": answer,
             "fact_match": fact_match,
             "abstained": abstained,
+            "abstention_reason": response.get("abstention_reason"),
+            "top_retrieval_score": response.get("top_retrieval_score"),
             "citations": citations,
             "latency_seconds": round(latency, 2),
             "retrieved_sources": response[
