@@ -18,7 +18,7 @@ jobs:
   hygiene:
     name: Repository quality
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 8
 
     steps:
       - name: Checkout
@@ -50,18 +50,21 @@ jobs:
 
       - name: Compile Python sources
         run: |
-          python -m compileall -q             bank-transaction-fraud-detection             credit-repayment-prediction             spam-detector             T9-typo-correction             llm-knowledge-base-assistant/app             llm-knowledge-base-assistant/eval
+          python -m compileall -q             apps/api             bank-transaction-fraud-detection             credit-repayment-prediction             spam-detector             T9-typo-correction             llm-knowledge-base-assistant/app             llm-knowledge-base-assistant/eval
 
       - name: Validate evaluation artifacts
         run: python scripts/validate_results.py
 
-      - name: Verify direct dependencies are pinned
+      - name: Verify pinned direct dependencies
         run: |
           python - <<'PY'
+          import json
           from pathlib import Path
 
-          files = [
+          requirement_files = [
               Path("requirements-dev.txt"),
+              Path("apps/api/requirements.txt"),
+              Path("apps/api/requirements-dev.txt"),
               Path("bank-transaction-fraud-detection/requirements.txt"),
               Path("credit-repayment-prediction/requirements.txt"),
               Path("spam-detector/requirements.txt"),
@@ -73,13 +76,21 @@ jobs:
           ]
 
           problems = []
-          for path in files:
+          for path in requirement_files:
               for number, raw in enumerate(path.read_text().splitlines(), start=1):
                   line = raw.strip()
                   if not line or line.startswith("#") or line.startswith("-r "):
                       continue
                   if "==" not in line:
                       problems.append(f"{path}:{number}: {line}")
+
+          package = json.loads(Path("apps/web/package.json").read_text())
+          for section in ("dependencies", "devDependencies"):
+              for name, version in package.get(section, {}).items():
+                  if version.startswith(("^", "~", ">", "<", "*")):
+                      problems.append(
+                          f"apps/web/package.json: {name} is not exactly pinned ({version})"
+                      )
 
           if problems:
               raise SystemExit(
@@ -150,8 +161,59 @@ jobs:
         working-directory: llm-knowledge-base-assistant
         run: python -m pytest -q tests
 
+  systems-lab:
+    name: ML Systems Lab
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: apps/api/requirements-dev.txt
+
+      - name: Test unified API
+        run: |
+          python -m pip install -r apps/api/requirements-dev.txt
+          python -m pip check
+          PYTHONPATH=apps/api python -m pytest -q apps/api/tests
+
+      - name: Build and start product stack
+        run: docker compose up -d --build api web
+
+      - name: Wait for web gateway
+        run: |
+          for attempt in {1..40}; do
+            if curl --fail --silent http://127.0.0.1:8080/health; then
+              exit 0
+            fi
+            sleep 2
+          done
+          docker compose logs
+          exit 1
+
+      - name: Smoke-test recruiter path
+        run: |
+          curl --fail --silent http://127.0.0.1:8080/ | grep -q "ML Systems Lab"
+          curl --fail --silent http://127.0.0.1:8080/api/models | python -m json.tool
+          curl --fail --silent             -H "Content-Type: application/json"             -d '{"text":"Call me when you arrive"}'             http://127.0.0.1:8080/api/spam/predict | python -m json.tool
+          curl --fail --silent             -H "Content-Type: application/json"             -d '{"text":"I am lerning pythom"}'             http://127.0.0.1:8080/api/t9/correct | python -m json.tool
+
+      - name: Stack logs
+        if: always()
+        run: docker compose logs || true
+
+      - name: Stop product stack
+        if: always()
+        run: docker compose down --remove-orphans || true
+
   spam-container:
-    name: Spam API container smoke test
+    name: Spam API container
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -192,6 +254,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - project: systems-lab-api
+            directory: apps/api
+            requirements: requirements-dev.txt
           - project: fraud
             directory: bank-transaction-fraud-detection
             requirements: requirements.txt
