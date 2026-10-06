@@ -73,7 +73,9 @@ python eval/calibrate_abstention.py
 export RAG_MIN_RETRIEVAL_SCORE="<printed threshold>"
 ```
 
-The calibration script writes `eval/threshold.json` with per-question top scores and the selected threshold. The API response exposes `abstained`, `abstention_reason`, and `top_retrieval_score`, so unsupported-query behavior is observable and testable. Because the included evaluation set is small, the threshold should be recalibrated on a larger representative set before production use.
+The committed calibration snapshot ([`eval/threshold.json`](eval/threshold.json)) produced **0.61346** as the balanced-accuracy optimum: **90.91%** balanced accuracy, **81.82%** answerable recall, and **100%** unanswerable recall on the included 14-question set.
+
+That threshold is deliberately **not enabled by default**. The calibration set is too small to justify silently rejecting ~18% of its answerable questions. Runtime gating is opt-in through `RAG_MIN_RETRIEVAL_SCORE`, and the threshold should be recalibrated on a larger representative set before production use. The API exposes `abstained`, `abstention_reason`, and `top_retrieval_score`, so the trade-off is observable rather than hidden.
 
 ## Run locally
 
