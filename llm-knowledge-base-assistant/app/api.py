@@ -79,6 +79,9 @@ class AskResponse(BaseModel):
     question: str
     answer: str
     retrieved_sources: list[RetrievedSource]
+    abstained: bool = False
+    abstention_reason: str | None = None
+    top_retrieval_score: float | None = None
     metrics: TimingMetrics
 
 
@@ -126,6 +129,9 @@ def ask(payload: AskRequest, request: Request):
                 "total_seconds": (
                     result["metrics"]["total_seconds"]
                 ),
+                "abstained": result.get("abstained", False),
+                "abstention_reason": result.get("abstention_reason"),
+                "top_retrieval_score": result.get("top_retrieval_score"),
                 "sources": [
                     f"{source['source']}:{source['chunk_id']}"
                     for source in result["retrieved_sources"]
