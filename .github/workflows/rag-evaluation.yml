@@ -1,0 +1,61 @@
+name: RAG Retrieval Evaluation
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/rag-evaluation.yml"
+      - "llm-knowledge-base-assistant/app/**"
+      - "llm-knowledge-base-assistant/eval/**"
+      - "llm-knowledge-base-assistant/data/sample_docs/**"
+      - "llm-knowledge-base-assistant/requirements.txt"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rag-evaluation-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: llm-knowledge-base-assistant/requirements.txt
+
+      - name: Install RAG runtime
+        working-directory: llm-knowledge-base-assistant
+        run: |
+          python -m pip install -r requirements.txt
+          python -m pip check
+
+      - name: Build FAISS index
+        working-directory: llm-knowledge-base-assistant
+        run: python -m app.build_index
+
+      - name: Evaluate retrieval
+        working-directory: llm-knowledge-base-assistant
+        run: python eval/evaluate_retrieval.py
+
+      - name: Calibrate abstention
+        working-directory: llm-knowledge-base-assistant
+        run: python eval/calibrate_abstention.py
+
+      - name: Show generated evaluation artifacts
+        working-directory: llm-knowledge-base-assistant
+        run: |
+          echo "--- eval/results.json ---"
+          cat eval/results.json
+          echo "--- eval/threshold.json ---"
+          cat eval/threshold.json
