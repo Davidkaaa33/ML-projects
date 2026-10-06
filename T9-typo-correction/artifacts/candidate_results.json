@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "generated_by": "advanced_typo_corrector.py",
+  "provenance": "Committed snapshot of the documented reproducible run; regenerate by executing advanced_typo_corrector.py.",
+  "dataset": {
+    "path": "data/t9_typo_correction_dataset.csv",
+    "synthetic": true,
+    "rows": 1647
+  },
+  "candidate_source": "closed vocabulary from dataset",
+  "metrics": {
+    "top_1_accuracy": 0.9775,
+    "top_3_recall": 0.9982
+  }
+}
