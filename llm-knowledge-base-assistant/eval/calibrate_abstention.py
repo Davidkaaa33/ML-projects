@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 from app.confidence import select_threshold
-from app.embeddings import MODEL_NAME
+from app.embeddings import MODEL_NAME, MODEL_REVISION
 from app.retrieval import Retriever
 
 
@@ -44,6 +44,7 @@ def calibrate():
         "generated_by": "eval/calibrate_abstention.py",
         "dataset": "eval/questions.json",
         "embedding_model": MODEL_NAME,
+        "embedding_revision": MODEL_REVISION,
         "optimization_metric": "balanced_accuracy",
         **selected,
         "records": records,
