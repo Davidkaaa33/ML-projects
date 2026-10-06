@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "generated_by": "fraud_detection.py",
+  "provenance": "Committed snapshot of the documented reproducible run; regenerate by executing fraud_detection.py.",
+  "dataset": {
+    "path": "data/bank_transactions_fraud_dataset.csv",
+    "synthetic": true
+  },
+  "split": {
+    "train": 0.6,
+    "validation": 0.2,
+    "test": 0.2,
+    "stratified": true,
+    "random_state": 42
+  },
+  "selection": {
+    "metric": "pr_auc",
+    "model": "Random Forest",
+    "configuration": "max_depth=8, min_samples_leaf=4, class_weight=None",
+    "threshold_metric": "validation_f1",
+    "threshold": 0.15
+  },
+  "test_metrics": {
+    "roc_auc": 0.8713,
+    "pr_auc": 0.3399,
+    "precision": 0.3452,
+    "recall": 0.4038,
+    "f1": 0.3722
+  }
+}
