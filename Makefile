@@ -78,7 +78,7 @@ app-up:
 	docker compose up --build
 
 app-up-rag:
-	docker compose --profile rag up --build
+	RAG_SERVICE_URL=http://rag:8000 docker compose --profile rag up --build
 
 app-down:
 	docker compose --profile rag down
