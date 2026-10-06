@@ -9,6 +9,8 @@ help:
 	@echo "  make audit           Audit pinned project dependencies for known vulnerabilities"
 	@echo "  make install-rag     Install the full RAG runtime"
 	@echo "  make rag-verify      Rebuild and verify committed RAG evaluation metrics"
+	@echo "  make app-up          Start the ML Systems Lab at http://localhost:8080"
+	@echo "  make app-up-rag      Start the lab with the optional RAG service"
 
 install-tools:
 	$(PYTHON) -m pip install -r requirements-dev.txt
@@ -22,7 +24,10 @@ install-rag-test:
 install-rag:
 	$(PYTHON) -m pip install -r llm-knowledge-base-assistant/requirements-dev.txt
 
-install-check: install-tools install-classical install-rag-test
+install-api:
+	$(PYTHON) -m pip install -r apps/api/requirements-dev.txt
+
+install-check: install-tools install-classical install-rag-test install-api
 
 lint:
 	$(PYTHON) -m ruff check .
@@ -30,7 +35,7 @@ lint:
 validate-artifacts:
 	$(PYTHON) scripts/validate_results.py
 
-test: test-classical test-rag
+test: test-classical test-rag test-api
 
 test-classical:
 	$(PYTHON) -m pytest -q bank-transaction-fraud-detection/tests
@@ -40,6 +45,9 @@ test-classical:
 
 test-rag:
 	cd llm-knowledge-base-assistant && $(PYTHON) -m pytest -q tests
+
+test-api:
+	PYTHONPATH=apps/api $(PYTHON) -m pytest -q apps/api/tests
 
 check: lint validate-artifacts
 	$(PYTHON) -m compileall -q 		bank-transaction-fraud-detection 		credit-repayment-prediction 		spam-detector 		T9-typo-correction 		llm-knowledge-base-assistant/app 		llm-knowledge-base-assistant/eval
@@ -65,3 +73,12 @@ audit:
 	cd spam-detector && $(PYTHON) -m pip_audit -r requirements-dev.txt
 	cd T9-typo-correction && $(PYTHON) -m pip_audit -r requirements.txt
 	cd llm-knowledge-base-assistant && $(PYTHON) -m pip_audit -r requirements-dev.txt
+
+app-up:
+	docker compose up --build
+
+app-up-rag:
+	docker compose --profile rag up --build
+
+app-down:
+	docker compose --profile rag down
