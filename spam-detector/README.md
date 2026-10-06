@@ -25,6 +25,8 @@ Confusion matrix, with actual classes as rows and predicted classes as columns:
 
 The error-analysis dataframes contain 0 false positives and 50 false negatives. Printed false negatives include adult-service, karaoke, ringtone, and premium-rate messages. This describes the observed errors without assuming a cause that the examples do not establish.
 
+Machine-readable evaluation snapshot: [`artifacts/results.json`](artifacts/results.json). Running `train.py` regenerates the artifact.
+
 ## Train and inspect errors
 
 ```bash
