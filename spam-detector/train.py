@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import joblib
@@ -13,6 +14,7 @@ RANDOM_STATE = 42
 PROJECT_DIR = Path(__file__).parent
 DATA_PATH = PROJECT_DIR / "data" / "spam.csv"
 MODEL_PATH = PROJECT_DIR / "model.joblib"
+RESULTS_PATH = PROJECT_DIR / "artifacts" / "results.json"
 
 
 def load_data():
@@ -67,6 +69,41 @@ def train_and_evaluate():
     return pipeline, metrics, matrix, false_positives, false_negatives
 
 
+def save_results(metrics, matrix, false_positives, false_negatives):
+    payload = {
+        "schema_version": 1,
+        "generated_by": "train.py",
+        "dataset": {
+            "path": "data/spam.csv",
+            "deduplicate_exact_messages": True,
+        },
+        "split": {
+            "train": 0.80,
+            "test": 0.20,
+            "stratified": True,
+            "random_state": RANDOM_STATE,
+        },
+        "model": "TfidfVectorizer + MultinomialNB",
+        "test_metrics": {
+            metric: float(value)
+            for metric, value in metrics.items()
+        },
+        "confusion_matrix": {
+            "labels": ["ham", "spam"],
+            "values": matrix.tolist(),
+        },
+        "error_counts": {
+            "false_positives": int(len(false_positives)),
+            "false_negatives": int(len(false_negatives)),
+        },
+    }
+    RESULTS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    RESULTS_PATH.write_text(
+        json.dumps(payload, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
 def main():
     pipeline, metrics, matrix, false_positives, false_negatives = train_and_evaluate()
     joblib.dump(pipeline, MODEL_PATH)
@@ -81,6 +118,8 @@ def main():
     print(f"False negatives: {len(false_negatives)}")
     print(false_negatives[["message"]].head(5).to_string(index=False))
     print(f"Saved pipeline to {MODEL_PATH}")
+    save_results(metrics, matrix, false_positives, false_negatives)
+    print(f"Saved metrics to {RESULTS_PATH}")
 
 
 if __name__ == "__main__":
