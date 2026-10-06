@@ -46,11 +46,11 @@ jobs:
 
       - name: Evaluate retrieval
         working-directory: llm-knowledge-base-assistant
-        run: python eval/evaluate_retrieval.py
+        run: PYTHONPATH=. python eval/evaluate_retrieval.py
 
       - name: Calibrate abstention
         working-directory: llm-knowledge-base-assistant
-        run: python eval/calibrate_abstention.py
+        run: PYTHONPATH=. python eval/calibrate_abstention.py
 
       - name: Show generated evaluation artifacts
         working-directory: llm-knowledge-base-assistant
