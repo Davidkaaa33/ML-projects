@@ -3,6 +3,8 @@
 [![Portfolio CI](https://github.com/Davidkaaa33/ML-projects/actions/workflows/ci.yml/badge.svg)](https://github.com/Davidkaaa33/ML-projects/actions/workflows/ci.yml)
 [![RAG Retrieval Evaluation](https://github.com/Davidkaaa33/ML-projects/actions/workflows/rag-evaluation.yml/badge.svg)](https://github.com/Davidkaaa33/ML-projects/actions/workflows/rag-evaluation.yml)
 
+**[Live Demo →](https://ml-systems-lab-davidkaaa33.up.railway.app)**
+
 ## ML Systems Lab
 
 **Five independently evaluated ML systems presented as one end-to-end product.**
@@ -22,9 +24,11 @@ Unified FastAPI
      └── Knowledge Assistant ── optional FAISS + Qwen/Ollama service
 ```
 
-### Run the product
+### Live product
 
-The standard stack exposes four live demos plus reproducible RAG evaluation:
+The public portfolio deployment is available at **[ml-systems-lab-davidkaaa33.up.railway.app](https://ml-systems-lab-davidkaaa33.up.railway.app)**. It runs as a single Railway service with the React production build served by the unified FastAPI application and sleeps when idle to keep resource usage low.
+
+To run the same stack locally:
 
 ```bash
 docker compose up --build
