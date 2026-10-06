@@ -5,7 +5,7 @@ services:
       dockerfile: apps/api/Dockerfile
     environment:
       WEB_ORIGINS: http://localhost:8080
-      RAG_SERVICE_URL: http://rag:8000
+      RAG_SERVICE_URL: ${RAG_SERVICE_URL:-}
     expose:
       - "8000"
 
