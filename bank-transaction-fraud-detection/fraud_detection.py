@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import numpy as np
@@ -19,7 +20,9 @@ from sklearn.preprocessing import FunctionTransformer, OneHotEncoder, StandardSc
 
 
 RANDOM_STATE = 42
-DATA_PATH = Path(__file__).parent / "data" / "bank_transactions_fraud_dataset.csv"
+PROJECT_DIR = Path(__file__).parent
+DATA_PATH = PROJECT_DIR / "data" / "bank_transactions_fraud_dataset.csv"
+RESULTS_PATH = PROJECT_DIR / "artifacts" / "results.json"
 TIME_ZONES = {
     "Germany": 1,
     "Kazakhstan": 5,
@@ -226,6 +229,41 @@ def run_training():
     return comparison_table, best_result, threshold, test_metrics, best_pipeline
 
 
+def save_results(comparison, best_result, threshold, test_metrics):
+    payload = {
+        "schema_version": 1,
+        "generated_by": "fraud_detection.py",
+        "dataset": {
+            "path": "data/bank_transactions_fraud_dataset.csv",
+            "synthetic": True,
+        },
+        "split": {
+            "train": 0.60,
+            "validation": 0.20,
+            "test": 0.20,
+            "stratified": True,
+            "random_state": RANDOM_STATE,
+        },
+        "selection": {
+            "metric": "pr_auc",
+            "model": best_result["model"],
+            "configuration": best_result["configuration"],
+            "threshold_metric": "validation_f1",
+            "threshold": float(threshold),
+        },
+        "validation_comparison": comparison.to_dict(orient="records"),
+        "test_metrics": {
+            metric: float(value)
+            for metric, value in test_metrics.items()
+        },
+    }
+    RESULTS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    RESULTS_PATH.write_text(
+        json.dumps(payload, indent=2, default=float) + "\n",
+        encoding="utf-8",
+    )
+
+
 def main():
     comparison, best_result, threshold, test_metrics, pipeline = run_training()
     print("Validation comparison (best configuration per model):")
@@ -235,6 +273,9 @@ def main():
     print("Final untouched test metrics:")
     for metric, value in test_metrics.items():
         print(f"{metric}: {value:.4f}")
+
+    save_results(comparison, best_result, threshold, test_metrics)
+    print(f"Saved metrics to {RESULTS_PATH}")
 
     example = {
         "customer_age": 62,
