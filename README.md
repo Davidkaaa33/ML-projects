@@ -40,17 +40,17 @@ For a compact deployable NLP service, open [SMS Spam Detector](spam-detector/). 
 Run the same core quality gates used in CI:
 
 ```bash
-make install-tools
-make install-classical
-make install-rag
+make install-check
 make check
 ```
 
-RAG retrieval evaluation and abstention calibration can be run separately:
+The full RAG runtime is only needed for embedding/index evaluation:
 
 ```bash
-make rag-eval
-make rag-calibrate
+make install-rag
+make rag-verify
 ```
+
+`make rag-verify` rebuilds the FAISS index, recomputes retrieval/calibration metrics and checks them against the committed snapshot with a small numerical tolerance.
 
 The tabular and T9 datasets are synthetic. The spam project uses the SMS Spam Collection dataset. Each project README documents its data assumptions, split design, metrics and limitations.
