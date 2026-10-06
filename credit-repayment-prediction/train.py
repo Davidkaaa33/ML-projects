@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 
 import pandas as pd
@@ -11,7 +12,9 @@ from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 
 RANDOM_STATE = 42
-DATA_PATH = Path(__file__).parent / "data" / "credit_repayment_dataset.csv"
+PROJECT_DIR = Path(__file__).parent
+DATA_PATH = PROJECT_DIR / "data" / "credit_repayment_dataset.csv"
+RESULTS_PATH = PROJECT_DIR / "artifacts" / "results.json"
 CATEGORICAL_COLUMNS = ["employment_status", "loan_purpose", "payment_method"]
 NUMERIC_COLUMNS = [
     "credit_amount",
@@ -150,6 +153,40 @@ def run_training():
     return comparison_table, best_result, test_metrics, importance
 
 
+def save_results(comparison, best_result, test_metrics, importance):
+    payload = {
+        "schema_version": 1,
+        "generated_by": "train.py",
+        "dataset": {
+            "path": "data/credit_repayment_dataset.csv",
+            "synthetic": True,
+        },
+        "split": {
+            "train": 0.60,
+            "validation": 0.20,
+            "test": 0.20,
+            "stratified": True,
+            "random_state": RANDOM_STATE,
+        },
+        "selection": {
+            "metric": "roc_auc",
+            "model": best_result["model"],
+            "configuration": best_result["configuration"],
+        },
+        "validation_comparison": comparison.to_dict(orient="records"),
+        "test_metrics": {
+            metric: float(value)
+            for metric, value in test_metrics.items()
+        },
+        "top_feature_importance": importance.to_dict(orient="records"),
+    }
+    RESULTS_PATH.parent.mkdir(parents=True, exist_ok=True)
+    RESULTS_PATH.write_text(
+        json.dumps(payload, indent=2, default=float) + "\n",
+        encoding="utf-8",
+    )
+
+
 def main():
     comparison, best_result, test_metrics, importance = run_training()
     print("Validation comparison (best configuration per model):")
@@ -160,6 +197,8 @@ def main():
         print(f"{metric}: {value:.4f}")
     print("\nTop Random Forest feature importances:")
     print(importance.to_string(index=False, float_format=lambda value: f"{value:.4f}"))
+    save_results(comparison, best_result, test_metrics, importance)
+    print(f"Saved metrics to {RESULTS_PATH}")
 
 
 if __name__ == "__main__":
