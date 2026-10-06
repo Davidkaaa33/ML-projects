@@ -2,6 +2,7 @@ from app.chunking import Chunk
 
 
 MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
+MODEL_REVISION = "1110a243fdf4706b3f48f1d95db1a4f5529b4d41"
 
 
 class EmbeddingModel:
@@ -10,7 +11,7 @@ class EmbeddingModel:
         # mocked assistants without downloading a transformer model.
         from sentence_transformers import SentenceTransformer
 
-        self.model = SentenceTransformer(MODEL_NAME)
+        self.model = SentenceTransformer(MODEL_NAME, revision=MODEL_REVISION)
 
     def encode_chunks(self, chunks: list[Chunk]):
         texts = [chunk.text for chunk in chunks]
