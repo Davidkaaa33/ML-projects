@@ -1,5 +1,7 @@
 # Machine Learning Projects
 
+[![Portfolio CI](https://github.com/Davidkaaa33/ML-projects/actions/workflows/ci.yml/badge.svg)](https://github.com/Davidkaaa33/ML-projects/actions/workflows/ci.yml)
+
 A compact portfolio of end-to-end ML work across tabular modeling, NLP, typo correction and local RAG.
 
 Each project includes a reproducible training/evaluation path, reported metrics and explicit limitations.
