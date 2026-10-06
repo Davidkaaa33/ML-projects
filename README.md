@@ -3,54 +3,118 @@
 [![Portfolio CI](https://github.com/Davidkaaa33/ML-projects/actions/workflows/ci.yml/badge.svg)](https://github.com/Davidkaaa33/ML-projects/actions/workflows/ci.yml)
 [![RAG Retrieval Evaluation](https://github.com/Davidkaaa33/ML-projects/actions/workflows/rag-evaluation.yml/badge.svg)](https://github.com/Davidkaaa33/ML-projects/actions/workflows/rag-evaluation.yml)
 
-End-to-end ML engineering portfolio covering tabular modeling, NLP, typo correction, APIs, Docker and local RAG.
+## ML Systems Lab
 
-**5 projects · tests in every project · 2 API services · reproducible evaluation artifacts · CI security/dependency audits**
+**Five independently evaluated ML systems presented as one end-to-end product.**
 
-> **Featured external project:** [Avito Candidate Retrieval](https://github.com/Davidkaaa33/avito-ds-bootcamp-2026-solution) — hybrid BM25 + BGE-M3 + geographic/microcategory retrieval with **Recall@50 0.831562**.
+The repository combines classical ML, NLP and local RAG with a recruiter-facing web interface, a unified FastAPI inference layer, Docker, tests, CI and committed evaluation artifacts. The interface is intentionally restrained: benchmark claims stay separate from interactive demo behavior.
 
-## Projects
+```text
+React / Vite
+     │
+     ▼
+Unified FastAPI
+     │
+     ├── Transaction Risk ── sklearn pipeline
+     ├── Credit Repayment ── sklearn pipeline
+     ├── SMS Spam ────────── serialized TF-IDF + NB
+     ├── T9 Correction ───── candidate ranking
+     └── Knowledge Assistant ── optional FAISS + Qwen/Ollama service
+```
 
-| Project | Focus | Methods | Result |
-| --- | --- | --- | --- |
-| [Bank Transaction Fraud Detection](bank-transaction-fraud-detection/) | imbalanced classification | feature engineering · Logistic Regression · Random Forest · threshold tuning | ROC-AUC **0.8713** · PR-AUC **0.3399** |
-| [Credit Repayment Prediction](credit-repayment-prediction/) | tabular risk | sklearn Pipeline · Logistic Regression · Random Forest | ROC-AUC **0.9550** · F1 **0.9162** |
-| [SMS Spam Detector](spam-detector/) | NLP + serving | deduplication · TF-IDF · Multinomial NB · FastAPI · Docker | Precision **1.0000** · F1 **0.7642** |
-| [T9 Typo Correction](T9-typo-correction/) | candidate ranking | Levenshtein search · explicit scoring · Random Forest | Top-1 **0.9775** · Top-3 **0.9982** |
-| [LLM Knowledge Base Assistant](llm-knowledge-base-assistant/) | local RAG | SentenceTransformers · FAISS · Qwen/Ollama · FastAPI | Hit@1 **81.82%** · MRR@3 **0.9091** |
+### Run the product
 
-## What this repository demonstrates
+The standard stack exposes four live demos plus reproducible RAG evaluation:
 
-- **Evaluation discipline** — baselines, validation design and held-out test sets before model complexity.
-- **Leakage-safe ML** — preprocessing and model selection are kept inside reproducible pipelines.
-- **Production-shaped interfaces** — FastAPI services, Docker images, health checks and container smoke tests.
-- **RAG quality controls** — retrieval metrics, citation auditing, calibrated abstention and metric-drift checks.
-- **Reproducibility** — pinned direct dependencies, committed machine-readable metrics and a pinned embedding-model revision.
-- **Repository hygiene** — Ruff, tests, compilation checks and dependency vulnerability audits run in GitHub Actions.
-- **Explicit limitations** — synthetic datasets, small evaluation sets and conditional metrics are documented rather than hidden.
+```bash
+docker compose up --build
+```
 
-## Where to start
+Open **http://localhost:8080**.
 
-For the strongest engineering example, open [LLM Knowledge Base Assistant](llm-knowledge-base-assistant/): it covers indexing, retrieval, evaluation, abstention, API serving and Docker.
+For live RAG generation, start Ollama on the host, make `qwen3.5:4b` available, then run:
 
-For a compact deployable NLP service, open [SMS Spam Detector](spam-detector/). For classical ML workflow and validation design, start with [Credit Repayment Prediction](credit-repayment-prediction/) or [Bank Transaction Fraud Detection](bank-transaction-fraud-detection/).
+```bash
+docker compose --profile rag up --build
+```
 
-## Reproduce the checks
+The heavy RAG runtime is optional by design. Without it, the site still exposes committed retrieval metrics and abstention calibration instead of pretending generation is available.
 
-Run the same core quality gates used in CI:
+## Systems
+
+| System | What it demonstrates | Result |
+| --- | --- | --- |
+| [Transaction Risk](bank-transaction-fraud-detection/) | imbalanced classification · feature engineering · threshold tuning | ROC-AUC **0.8713** · PR-AUC **0.3399** |
+| [Credit Repayment](credit-repayment-prediction/) | leakage-safe preprocessing · validation-led model selection | ROC-AUC **0.9550** · F1 **0.9162** |
+| [SMS Spam](spam-detector/) | deduplication · TF-IDF · FastAPI · Docker | Precision **1.0000** · F1 **0.7642** |
+| [T9 Correction](T9-typo-correction/) | edit-distance retrieval · deterministic candidate ranking | Top-1 **0.9775** · Top-3 **0.9982** |
+| [Knowledge Assistant](llm-knowledge-base-assistant/) | FAISS retrieval · citations · calibrated abstention · local LLM | Hit@1 **81.82%** · Hit@3 **100%** · MRR@3 **0.9091** |
+
+> **External flagship:** [Avito Candidate Retrieval](https://github.com/Davidkaaa33/avito-ds-bootcamp-2026-solution) — hybrid BM25 + BGE-M3 + geographic/microcategory retrieval with **Recall@50 0.831562**.
+
+## Product boundary
+
+The web application does not reimplement the models. `apps/api` adapts the existing project code behind typed HTTP contracts:
+
+- **Spam** loads the committed `model.joblib` artifact.
+- **T9** calls the evaluated candidate-ranking implementation directly.
+- **Fraud/Credit** lazily fit one interactive demo model using the already selected configuration and the full synthetic dataset.
+- **Held-out benchmark metrics never come from those demo fits**; they remain sourced from committed evaluation artifacts.
+- **RAG** stays a separate optional service because its embedding/index/LLM runtime is materially heavier than the other systems.
+
+This separation keeps the demo useful without blurring evaluation methodology.
+
+## Engineering evidence
+
+| Area | Evidence |
+| --- | --- |
+| **Evaluation** | held-out metrics · JSON snapshots · RAG retrieval/calibration workflow |
+| **Quality** | Ruff · pytest · compile checks · API contract tests |
+| **Serving** | unified FastAPI gateway · project API services · health endpoints |
+| **Containers** | non-root runtime containers · health checks · full-stack Compose |
+| **RAG controls** | pinned embedding revision · abstention calibration · semantic metric-drift gate |
+| **Security hygiene** | pinned direct dependencies · `pip-audit` in CI |
+| **Reproducibility** | Python 3.12 · deterministic splits · committed metrics · one-command local stack |
+
+## Repository map
+
+```text
+apps/
+├── api/                         unified inference + model registry
+└── web/                         recruiter-facing React interface
+
+bank-transaction-fraud-detection/
+credit-repayment-prediction/
+spam-detector/
+T9-typo-correction/
+llm-knowledge-base-assistant/
+
+scripts/                         repository-level validation
+.github/workflows/               CI + RAG evaluation
+docker-compose.yml               full product stack
+Makefile                         local quality/evaluation commands
+```
+
+## Local quality gates
+
+Install the lightweight dependencies required for repository checks:
 
 ```bash
 make install-check
 make check
 ```
 
-The full RAG runtime is only needed for embedding/index evaluation:
+Install the full embedding runtime only when reproducing RAG retrieval:
 
 ```bash
 make install-rag
 make rag-verify
 ```
 
-`make rag-verify` rebuilds the FAISS index, recomputes retrieval/calibration metrics and checks them against the committed snapshot with a small numerical tolerance.
+`make rag-verify` rebuilds the FAISS index, recomputes retrieval and abstention metrics, then compares them with the committed snapshots using a small numerical tolerance.
 
-The tabular and T9 datasets are synthetic. The spam project uses the SMS Spam Collection dataset. Each project README documents its data assumptions, split design, metrics and limitations.
+## Data and limitations
+
+The Fraud, Credit and T9 datasets are synthetic and are labeled as such in both the UI and project documentation. The Spam project uses the SMS Spam Collection dataset. The RAG evaluation corpus is intentionally small, so its calibrated abstention threshold is **measured but not silently enabled as a production default**.
+
+For split design, feature logic, metric interpretation and model-specific limitations, use the README inside each project directory.
