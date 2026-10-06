@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "generated_by": "typo_type_classifier.py",
+  "provenance": "Committed snapshot of the documented reproducible run; regenerate by executing typo_type_classifier.py.",
+  "dataset": {
+    "path": "data/t9_typo_correction_dataset.csv",
+    "synthetic": true
+  },
+  "split": {
+    "train": 0.8,
+    "test": 0.2,
+    "stratified": true,
+    "random_state": 42
+  },
+  "evaluation_scope": "Conditional typo-type classification using the known correct candidate",
+  "accuracy": 1.0
+}
