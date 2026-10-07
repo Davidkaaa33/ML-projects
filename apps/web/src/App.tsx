@@ -44,9 +44,9 @@ function App() {
 
         <nav className="portfolio-nav" aria-label="Portfolio navigation">
           <a href="#overview">Overview</a>
+          <a href="#about">About</a>
           <a href="#projects">Projects</a>
           <a href="#lab">ML Systems Lab</a>
-          <a href="#about">About</a>
         </nav>
 
         <ExternalLinks compact />
@@ -88,6 +88,33 @@ function App() {
               <em>Hit@3 100% · MRR@3 0.9091</em>
             </a>
           </aside>
+        </section>
+
+        <section className="portfolio-section about-section" id="about">
+          <div className="section-heading">
+            <p className="section-kicker">About me</p>
+            <h2>Building ML systems beyond notebooks.</h2>
+          </div>
+
+          <div className="about-layout">
+            <p className="about-copy">
+              I’m a second-year BSc student in Data Analysis and Artificial Intelligence
+              at Innopolis University, with a 4.9/5.0 GPA. I’m focused on ML Engineering,
+              NLP and information retrieval, and on building ML projects beyond notebooks —
+              with evaluation, APIs, testing and deployment.
+            </p>
+
+            {aboutFacts.length > 0 && (
+              <dl className="about-facts">
+                {aboutFacts.map((fact) => (
+                  <div key={fact.label}>
+                    <dt>{fact.label}</dt>
+                    <dd>{fact.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+          </div>
         </section>
 
         <section className="portfolio-section selected-work" id="projects">
@@ -183,32 +210,6 @@ function App() {
 
         <MLSystemsLab />
 
-        <section className="portfolio-section about-section" id="about">
-          <div className="section-heading">
-            <p className="section-kicker">About</p>
-            <h2>Applied ML, with engineering boundaries kept visible.</h2>
-          </div>
-
-          <div className="about-layout">
-            <p className="about-copy">
-              I’m a second-year BSc student in Data Analysis and Artificial Intelligence
-              at Innopolis University, with a 4.9/5.0 GPA. I’m focused on ML Engineering,
-              NLP and information retrieval, and on building ML projects beyond notebooks —
-              with evaluation, APIs, testing and deployment.
-            </p>
-
-            {aboutFacts.length > 0 && (
-              <dl className="about-facts">
-                {aboutFacts.map((fact) => (
-                  <div key={fact.label}>
-                    <dt>{fact.label}</dt>
-                    <dd>{fact.value}</dd>
-                  </div>
-                ))}
-              </dl>
-            )}
-          </div>
-        </section>
       </main>
 
       <footer className="portfolio-footer">
