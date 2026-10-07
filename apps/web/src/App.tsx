@@ -191,9 +191,10 @@ function App() {
 
           <div className="about-layout">
             <p className="about-copy">
-              I’m focused on machine learning engineering and applied data science.
-              I’m particularly interested in retrieval systems, NLP and building ML
-              projects beyond notebooks — with evaluation, APIs, testing and deployment.
+              I’m a second-year BSc student in Data Analysis and Artificial Intelligence
+              at Innopolis University, with a 4.9/5.0 GPA. I’m focused on ML Engineering,
+              NLP and information retrieval, and on building ML projects beyond notebooks —
+              with evaluation, APIs, testing and deployment.
             </p>
 
             {aboutFacts.length > 0 && (
