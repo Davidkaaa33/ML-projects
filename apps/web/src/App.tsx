@@ -233,7 +233,6 @@ function SpamDemo() {
               setText("");
               setResult(null);
               setTrace(null);
-              setTrace(null);
             }}
           >
             Clear
@@ -278,6 +277,7 @@ function SpamDemo() {
             if (item) {
               setText(item.text);
               setResult(item.result);
+              setTrace(null);
             }
           }}
         />
@@ -428,6 +428,7 @@ function TypoDemo() {
             onClick={() => {
               setText("");
               setResult(null);
+              setTrace(null);
             }}
           >
             Clear
@@ -467,6 +468,7 @@ function TypoDemo() {
             if (item) {
               setText(item.input);
               setResult(item.result);
+              setTrace(null);
             }
           }}
         />
@@ -715,6 +717,7 @@ function RecordDemo({ kind }: { kind: "fraud" | "credit" }) {
             if (item) {
               setRecord({ ...item.record });
               setResult(item.result);
+              setTrace(null);
             }
           }}
         />
@@ -1171,11 +1174,11 @@ function SystemHeader({
 
       <div className="system-summary">
         <div>
-          <span>{model.headline_metric}</span>
-          <strong>{model.headline_value}</strong>
+          <span>Held-out benchmark</span>
+          <strong>{model.headline_metric} {model.headline_value}</strong>
         </div>
         <div>
-          <span>Secondary</span>
+          <span>Also reported</span>
           <strong>{model.secondary_metric}</strong>
         </div>
       </div>
