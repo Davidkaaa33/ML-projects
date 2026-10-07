@@ -245,15 +245,6 @@ code,
   min-width: 0;
 }
 
-.system-kicker {
-  margin-bottom: 12px;
-  color: var(--faint);
-  font-family: "SFMono-Regular", Consolas, monospace;
-  font-size: 9px;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-}
-
 .system-header h1 {
   margin: 0;
   font-size: clamp(36px, 4.8vw, 54px);
