@@ -122,14 +122,16 @@ function App() {
                     {project.technologies.join(", ")}
                   </div>
 
-                  <div className="project-actions">
-                    {project.liveUrl && <a href={project.liveUrl}>Open lab</a>}
-                    {project.sourceUrl && (
-                      <a href={project.sourceUrl} target="_blank" rel="noreferrer">
-                        Source
-                      </a>
-                    )}
-                  </div>
+                  {(project.liveUrl || project.sourceUrl) && (
+                    <div className="project-actions">
+                      {project.liveUrl && <a href={project.liveUrl}>Open lab</a>}
+                      {project.sourceUrl && (
+                        <a href={project.sourceUrl} target="_blank" rel="noreferrer">
+                          Source
+                        </a>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <dl className="project-results" aria-label={`${project.title} results`}>
