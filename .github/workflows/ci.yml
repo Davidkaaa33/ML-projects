@@ -199,7 +199,7 @@ jobs:
 
       - name: Smoke-test recruiter path
         run: |
-          curl --fail --silent http://127.0.0.1:8080/ | grep -q "ML Systems Lab"
+          curl --fail --silent http://127.0.0.1:8080/ | grep -q "Machine Learning Engineer"
           curl --fail --silent http://127.0.0.1:8080/api/models | python -m json.tool
           curl --fail --silent             -H "Content-Type: application/json"             -d '{"text":"Call me when you arrive"}'             http://127.0.0.1:8080/api/spam/predict | python -m json.tool
           curl --fail --silent             -H "Content-Type: application/json"             -d '{"text":"I am lerning pythom"}'             http://127.0.0.1:8080/api/t9/correct | python -m json.tool
