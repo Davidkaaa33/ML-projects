@@ -33,9 +33,9 @@ function App() {
         </a>
 
         <nav className="portfolio-nav" aria-label="Portfolio navigation">
+          <a href="#about">About</a>
           <a href="#work">Work</a>
           <a href="#lab">Lab</a>
-          <a href="#about">About</a>
         </nav>
 
         <ExternalLinks compact />
@@ -56,6 +56,45 @@ function App() {
           <div className="hero-actions">
             <a className="primary-action" href="#work">Selected work</a>
             <a className="secondary-action" href="#lab">Interactive ML lab</a>
+          </div>
+        </section>
+
+        <section className="portfolio-section about-section" id="about">
+          <div className="section-heading">
+            <h2>About</h2>
+          </div>
+
+          <div className="about-layout">
+            <p className="about-copy">
+              Second-year BSc student in Data Analysis and Artificial Intelligence at
+              Innopolis University. I focus on ML engineering, NLP and information
+              retrieval, with an emphasis on evaluation, reproducibility and deployable
+              systems rather than notebook-only experiments.
+            </p>
+
+            <dl className="about-facts">
+              <div>
+                <dt>Education</dt>
+                <dd>{profile.education}</dd>
+              </div>
+              <div>
+                <dt>Current status</dt>
+                <dd>{profile.currentStatus}</dd>
+              </div>
+              <div>
+                <dt>Target roles</dt>
+                <dd>{profile.targetRoles.join(" · ")}</dd>
+              </div>
+            </dl>
+          </div>
+
+          <div className="capability-grid">
+            {capabilities.map((capability) => (
+              <div className="capability-group" key={capability.title}>
+                <h3>{capability.title}</h3>
+                <p>{capability.items.join(" · ")}</p>
+              </div>
+            ))}
           </div>
         </section>
 
