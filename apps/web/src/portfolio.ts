@@ -17,7 +17,7 @@ export const profile = {
     "Projects in retrieval, NLP, tabular machine learning and deployable ML systems.",
   github: "https://github.com/Davidkaaa33",
   linkedin: "",
-  resume: "/David_Danielian_CV.pdf",
+  resume: "/David_Danielian_CV.html",
   email: "d.danielian@innopolis.university",
   telegram: "https://t.me/Dava_Djan",
   education:
