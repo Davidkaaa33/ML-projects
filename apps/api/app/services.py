@@ -303,6 +303,7 @@ def rag_evaluation() -> dict[str, Any]:
                 "embedding_revision",
             )
         },
+        "calibration_records": threshold["records"],
     }
 
 
