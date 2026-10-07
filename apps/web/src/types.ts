@@ -1,5 +1,7 @@
+export type ModelId = "fraud" | "credit" | "spam" | "typo" | "rag";
+
 export type ModelInfo = {
-  id: "fraud" | "credit" | "spam" | "typo" | "rag";
+  id: ModelId;
   name: string;
   task: string;
   description: string;
@@ -25,6 +27,13 @@ export type Overview = {
   };
 };
 
+export type CalibrationRecord = {
+  id: number;
+  question: string;
+  answerable: boolean;
+  top_score: number;
+};
+
 export type RAGEvaluation = {
   retrieval: {
     total_questions: number;
@@ -42,4 +51,5 @@ export type RAGEvaluation = {
     embedding_model: string;
     embedding_revision: string;
   };
+  calibration_records: CalibrationRecord[];
 };
