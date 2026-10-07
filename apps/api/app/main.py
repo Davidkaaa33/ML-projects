@@ -46,6 +46,14 @@ app.add_middleware(
 )
 
 
+@app.middleware("http")
+async def cache_static_entrypoint(request, call_next):
+    response = await call_next(request)
+    if request.url.path == "/" or request.url.path.endswith(".html"):
+        response.headers["Cache-Control"] = "no-cache, must-revalidate"
+    return response
+
+
 class TextRequest(BaseModel):
     text: str = Field(min_length=1, max_length=5000)
 
