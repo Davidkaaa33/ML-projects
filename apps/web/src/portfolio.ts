@@ -14,18 +14,18 @@ export type FeaturedProject = {
 
 export const profile = {
   firstName: "David",
-  surname: "", // TODO: add surname.
+  surname: "Danielian",
   role: "Machine Learning Engineer / Data Scientist",
   summary:
     "I build evaluated machine learning systems — from classical ML and retrieval pipelines to APIs, Dockerized inference and production-oriented evaluation.",
   github: "https://github.com/Davidkaaa33",
   linkedin: "", // TODO: add LinkedIn URL.
-  resume: "", // TODO: add public resume URL.
-  email: "", // TODO: add preferred contact email.
-  education: "", // TODO: add education.
-  location: "", // TODO: add location if you want it public.
-  currentStatus: "", // TODO: add current status.
-  targetRoles: [] as string[] // TODO: add target roles if you want them shown.
+  resume: "/David_Danielian_CV.pdf",
+  email: "d.danielian@innopolis.university",
+  education: "Innopolis University · BSc in Data Analysis and Artificial Intelligence · 2025–2028 · GPA 4.9/5.0",
+  location: "Innopolis, Russia",
+  currentStatus: "Second-year BSc student · full-tuition scholarship",
+  targetRoles: ["Machine Learning Engineer", "Data Scientist"] as string[]
 };
 
 export const profileName = [profile.firstName, profile.surname]
