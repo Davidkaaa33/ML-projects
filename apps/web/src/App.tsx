@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { api } from "./api";
+import { api, apiTrace, type ApiTrace } from "./api";
 import type {
   CalibrationRecord,
   ModelId,
@@ -10,8 +10,6 @@ import type {
 } from "./types";
 
 const GITHUB = "https://github.com/Davidkaaa33/ML-projects";
-const ACTIONS = `${GITHUB}/actions`;
-
 const serviceOrder: ModelId[] = ["spam", "typo", "fraud", "credit", "rag"];
 
 const endpointByModel: Record<ModelId, string> = {
@@ -118,6 +116,35 @@ function History({
   );
 }
 
+function RequestInspector<T>({ trace }: { trace: ApiTrace<T> | null }) {
+  if (!trace) return null;
+
+  return (
+    <details className="request-inspector">
+      <summary>
+        <span>Inspect API request</span>
+        <span className="inspector-meta">
+          {trace.method} · {Math.round(trace.durationMs)} ms
+        </span>
+      </summary>
+      <div className="inspector-content">
+        <div>
+          <span className="result-caption">Endpoint</span>
+          <code>{trace.endpoint}</code>
+        </div>
+        <div>
+          <span className="result-caption">Request</span>
+          <pre>{JSON.stringify(trace.request, null, 2)}</pre>
+        </div>
+        <div>
+          <span className="result-caption">Response</span>
+          <pre>{JSON.stringify(trace.response, null, 2)}</pre>
+        </div>
+      </div>
+    </details>
+  );
+}
+
 function SpamDemo() {
   const presets = [
     {
@@ -152,6 +179,8 @@ function SpamDemo() {
 
   const [text, setText] = useState(presets[1].text);
   const [result, setResult] = useState<SpamResult | null>(null);
+  const [trace, setTrace] = useState<ApiTrace<SpamResult> | null>(null);
+  const [threshold, setThreshold] = useState(0.5);
   const [history, setHistory] = useState<SpamHistory[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -161,10 +190,12 @@ function SpamDemo() {
     setBusy(true);
     setError("");
     try {
-      const next = await api<SpamResult>("/api/spam/predict", {
+      const traced = await apiTrace<SpamResult>("/api/spam/predict", {
         method: "POST",
         body: JSON.stringify({ text })
       });
+      const next = traced.data;
+      setTrace(traced);
       setResult(next);
       setHistory((items) => [
         { id: Date.now(), text, result: next },
@@ -189,6 +220,7 @@ function SpamDemo() {
                 onClick={() => {
                   setText(preset.text);
                   setResult(null);
+                  setTrace(null);
                 }}
               >
                 {preset.name}
@@ -200,6 +232,8 @@ function SpamDemo() {
             onClick={() => {
               setText("");
               setResult(null);
+              setTrace(null);
+              setTrace(null);
             }}
           >
             Clear
@@ -259,18 +293,39 @@ function SpamDemo() {
           <div className="result-content" key={`${result.label}-${result.spam_probability}`}>
             <div className="decision-row">
               <div>
-                <span className="result-caption">Decision</span>
-                <strong className="decision-value">{result.label.toUpperCase()}</strong>
+                <span className="result-caption">Decision at current threshold</span>
+                <strong className="decision-value">
+                  {result.spam_probability >= threshold ? "SPAM" : "HAM"}
+                </strong>
               </div>
-              <span className={`decision-badge ${result.label === "spam" ? "danger" : "safe"}`}>
-                {formatPercent(result.confidence)} confidence
+              <span className="decision-badge neutral">
+                p(spam) {formatPercent(result.spam_probability)}
               </span>
             </div>
 
             <ProbabilityRail
               value={result.spam_probability}
+              marker={threshold}
               label="Spam probability"
             />
+
+            <div className="threshold-editor">
+              <div>
+                <span>Decision threshold</span>
+                <strong>{threshold.toFixed(2)}</strong>
+              </div>
+              <input
+                type="range"
+                min="0.05"
+                max="0.95"
+                step="0.05"
+                value={threshold}
+                onChange={(event) => setThreshold(Number(event.target.value))}
+              />
+              <button className="control-button subtle" onClick={() => setThreshold(0.5)}>
+                Reset 0.50
+              </button>
+            </div>
 
             <div className="explain-list">
               <div>
@@ -282,6 +337,7 @@ function SpamDemo() {
                 <strong>Precision 1.0000 · F1 0.7642</strong>
               </div>
             </div>
+            <RequestInspector trace={trace} />
           </div>
         ) : (
           <div className="empty-state">
@@ -320,6 +376,7 @@ function TypoDemo() {
 
   const [text, setText] = useState(presets[0]);
   const [result, setResult] = useState<TypoResult | null>(null);
+  const [trace, setTrace] = useState<ApiTrace<TypoResult> | null>(null);
   const [history, setHistory] = useState<TypoHistory[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -329,10 +386,12 @@ function TypoDemo() {
     setBusy(true);
     setError("");
     try {
-      const next = await api<TypoResult>("/api/t9/correct", {
+      const traced = await apiTrace<TypoResult>("/api/t9/correct", {
         method: "POST",
         body: JSON.stringify({ text })
       });
+      const next = traced.data;
+      setTrace(traced);
       setResult(next);
       setHistory((items) => [
         { id: Date.now(), input: text, result: next },
@@ -357,6 +416,7 @@ function TypoDemo() {
                 onClick={() => {
                   setText(preset);
                   setResult(null);
+                  setTrace(null);
                 }}
               >
                 Example {index + 1}
@@ -463,6 +523,7 @@ function TypoDemo() {
             ) : (
               <div className="inline-note">No corrections were required.</div>
             )}
+            <RequestInspector trace={trace} />
           </div>
         ) : (
           <div className="empty-state">
@@ -492,6 +553,7 @@ function RecordDemo({ kind }: { kind: "fraud" | "credit" }) {
   const [selectedPreset, setSelectedPreset] = useState("");
   const [record, setRecord] = useState<Record<string, unknown> | null>(null);
   const [result, setResult] = useState<RecordPrediction | null>(null);
+  const [trace, setTrace] = useState<ApiTrace<RecordPrediction> | null>(null);
   const [history, setHistory] = useState<
     Array<{
       id: number;
@@ -526,12 +588,14 @@ function RecordDemo({ kind }: { kind: "fraud" | "credit" }) {
     setSelectedPreset(name);
     setRecord({ ...value });
     setResult(null);
+    setTrace(null);
   }
 
   function resetPreset() {
     if (!examples || !selectedPreset || !examples[selectedPreset]) return;
     setRecord({ ...examples[selectedPreset] });
     setResult(null);
+    setTrace(null);
   }
 
   function updateField(key: string, raw: string) {
@@ -552,10 +616,12 @@ function RecordDemo({ kind }: { kind: "fraud" | "credit" }) {
     setBusy(true);
     setError("");
     try {
-      const next = await api<RecordPrediction>(`/api/${kind}/predict`, {
+      const traced = await apiTrace<RecordPrediction>(`/api/${kind}/predict`, {
         method: "POST",
         body: JSON.stringify({ record })
       });
+      const next = traced.data;
+      setTrace(traced);
       setResult(next);
 
       const probability =
@@ -699,6 +765,7 @@ function RecordDemo({ kind }: { kind: "fraud" | "credit" }) {
             <div className="inline-note">
               Benchmark metrics come from the held-out test split; this playground result does not overwrite them.
             </div>
+            <RequestInspector trace={trace} />
           </div>
         ) : (
           <div className="empty-state">
@@ -1019,8 +1086,8 @@ function RAGDemo() {
       <section className="rag-live-pane">
         <div className="panel-heading">
           <span>Generation</span>
-          <span className={`service-state ${status?.available ? "online" : "eval"}`}>
-            {status?.available ? "LIVE" : "EVAL ONLY"}
+          <span className="mono-label">
+            {status?.available ? "local runtime connected" : "public runtime disabled"}
           </span>
         </div>
 
@@ -1094,19 +1161,12 @@ function SystemHeader({
     <div className="system-header">
       <div>
         <div className="system-kicker">
-          <span className={`service-state ${model.live ? "online" : "eval"}`}>
-            {model.live ? "LIVE" : "EVAL"}
-          </span>
           <span>{model.task}</span>
           <span>{model.data_scope}</span>
         </div>
         <h1>{model.name}</h1>
         <p>{model.description}</p>
-        <div className="tech-line">
-          {model.technology.map((item) => (
-            <span key={item}>{item}</span>
-          ))}
-        </div>
+        <div className="system-meta">{model.technology.join(" · ")}</div>
       </div>
 
       <div className="system-summary">
@@ -1192,12 +1252,8 @@ function App() {
           <span className="header-subtitle">interactive inference & evaluation</span>
         </div>
         <div className="header-actions">
-          <span className={`api-health ${overview ? "online" : ""}`}>
-            <span />
-            {overview ? "API online" : "connecting"}
-          </span>
-          <a href={ACTIONS} target="_blank" rel="noreferrer">
-            CI
+          <a href="/docs" target="_blank" rel="noreferrer">
+            API docs ↗
           </a>
           <a href={GITHUB} target="_blank" rel="noreferrer">
             GitHub ↗
@@ -1209,7 +1265,7 @@ function App() {
         <aside className="service-sidebar">
           <div className="sidebar-label">Systems</div>
           <nav className="service-list">
-            {models.map((model, index) => (
+            {models.map((model) => (
               <button
                 key={model.id}
                 className={`service-button ${active === model.id ? "active" : ""}`}
@@ -1218,7 +1274,6 @@ function App() {
                   setCopied(false);
                 }}
               >
-                <span className="service-index">0{index + 1}</span>
                 <span className="service-button-copy">
                   <strong>{model.name}</strong>
                   <small>{model.task}</small>
@@ -1228,16 +1283,6 @@ function App() {
             ))}
           </nav>
 
-          <div className="sidebar-footer">
-            <div>
-              <span>Quality gates</span>
-              <strong>{overview?.quality.ci ? "passing" : "—"}</strong>
-            </div>
-            <div>
-              <span>Metric artifacts</span>
-              <strong>{overview?.quality.reproducible_metrics ? "committed" : "—"}</strong>
-            </div>
-          </div>
         </aside>
 
         <main className="main-console">
@@ -1263,24 +1308,6 @@ function App() {
               {active === "credit" && <RecordDemo kind="credit" />}
               {active === "rag" && <RAGDemo />}
 
-              <div className="evidence-strip">
-                <div>
-                  <span>Evaluation</span>
-                  <strong>held-out / committed</strong>
-                </div>
-                <div>
-                  <span>Tests</span>
-                  <strong>pytest + API contracts</strong>
-                </div>
-                <div>
-                  <span>Serving</span>
-                  <strong>FastAPI + Docker</strong>
-                </div>
-                <div>
-                  <span>Security</span>
-                  <strong>pinned deps + audit</strong>
-                </div>
-              </div>
             </div>
           ) : (
             <div className="loading-console">
