@@ -2385,7 +2385,7 @@ summary:focus-visible {
 }
 
 .hero-meta span + span::before {
-  content: "·";
+  content: none;
   margin-right: 22px;
   color: #aaa9a2;
 }
