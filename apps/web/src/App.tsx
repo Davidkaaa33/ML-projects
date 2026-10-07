@@ -1,74 +1,175 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { api } from "./api";
-import type { ModelInfo, Overview, RAGEvaluation } from "./types";
+import type {
+  CalibrationRecord,
+  ModelId,
+  ModelInfo,
+  Overview,
+  RAGEvaluation
+} from "./types";
 
 const GITHUB = "https://github.com/Davidkaaa33/ML-projects";
-const tabs = ["spam", "typo", "fraud", "credit", "rag"] as const;
-type DemoTab = (typeof tabs)[number];
+const ACTIONS = `${GITHUB}/actions`;
 
-function formatPercent(value: number) {
-  return `${(value * 100).toFixed(1)}%`;
+const serviceOrder: ModelId[] = ["spam", "typo", "fraud", "credit", "rag"];
+
+const endpointByModel: Record<ModelId, string> = {
+  spam: "/api/spam/predict",
+  typo: "/api/t9/correct",
+  fraud: "/api/fraud/predict",
+  credit: "/api/credit/predict",
+  rag: "/api/rag/evaluation"
+};
+
+function formatPercent(value: number, digits = 1) {
+  return `${(value * 100).toFixed(digits)}%`;
 }
 
-function ModelCard({ model, onOpen }: { model: ModelInfo; onOpen: () => void }) {
+function formatScore(value: number) {
+  return value.toFixed(3);
+}
+
+function clamp(value: number, min = 0, max = 1) {
+  return Math.min(max, Math.max(min, value));
+}
+
+function ProbabilityRail({
+  value,
+  marker,
+  label
+}: {
+  value: number;
+  marker?: number;
+  label: string;
+}) {
+  const safe = clamp(value);
   return (
-    <article className="model-card">
-      <div className="card-topline">
-        <span className="status-dot" data-live={model.live} />
-        <span>{model.task}</span>
-        <span className="scope">{model.data_scope}</span>
+    <div className="probability-block">
+      <div className="probability-labels">
+        <span>{label}</span>
+        <strong>{formatPercent(safe)}</strong>
       </div>
-
-      <h3>{model.name}</h3>
-      <p>{model.description}</p>
-
-      <div className="metric-row">
-        <div>
-          <span className="metric-label">{model.headline_metric}</span>
-          <strong>{model.headline_value}</strong>
-        </div>
-        <span className="secondary-metric">{model.secondary_metric}</span>
+      <div className="probability-rail" aria-label={label}>
+        <span className="probability-fill" style={{ width: formatPercent(safe, 2) }} />
+        {typeof marker === "number" && (
+          <span
+            className="threshold-marker"
+            style={{ left: formatPercent(clamp(marker), 2) }}
+            title={`Decision threshold ${marker.toFixed(3)}`}
+          />
+        )}
       </div>
-
-      <div className="tag-row">
-        {model.technology.map((item) => (
-          <span key={item}>{item}</span>
-        ))}
-      </div>
-
-      <div className="card-actions">
-        <button className="text-button" onClick={onOpen}>
-          Open demo
-        </button>
-        <a href={`${GITHUB}/tree/main/${model.repo_path}`} target="_blank" rel="noreferrer">
-          Source
-        </a>
-      </div>
-    </article>
+    </div>
   );
 }
 
-function OutputBlock({ children }: { children: React.ReactNode }) {
-  return <div className="output-block">{children}</div>;
+function RunButton({
+  busy,
+  disabled,
+  onClick,
+  children
+}: {
+  busy: boolean;
+  disabled?: boolean;
+  onClick: () => void;
+  children: string;
+}) {
+  return (
+    <button
+      className="run-button"
+      onClick={onClick}
+      disabled={disabled || busy}
+      data-busy={busy}
+    >
+      <span className="run-icon">{busy ? "···" : "▶"}</span>
+      <span>{busy ? "Running model…" : children}</span>
+    </button>
+  );
+}
+
+function History({
+  items,
+  onSelect
+}: {
+  items: Array<{ id: number; title: string; detail: string; value: string }>;
+  onSelect?: (id: number) => void;
+}) {
+  if (!items.length) return null;
+
+  return (
+    <div className="history-block">
+      <div className="subsection-title">Recent runs</div>
+      <div className="history-list">
+        {items.slice(0, 5).map((item) => (
+          <button
+            key={item.id}
+            className="history-row"
+            onClick={() => onSelect?.(item.id)}
+            disabled={!onSelect}
+          >
+            <span className="history-title">{item.title}</span>
+            <span className="history-detail">{item.detail}</span>
+            <strong>{item.value}</strong>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 function SpamDemo() {
-  const [text, setText] = useState("Congratulations! You've won a free prize. Call now to claim.");
-  const [result, setResult] = useState<{ label: string; spam_probability: number; confidence: number } | null>(null);
-  const [error, setError] = useState("");
+  const presets = [
+    {
+      name: "Normal",
+      text: "Call me when you arrive, I'll meet you downstairs."
+    },
+    {
+      name: "Prize spam",
+      text: "URGENT! You have won a £500 reward. Reply WIN now to claim your prize."
+    },
+    {
+      name: "Promo",
+      text: "Free entry in our weekly prize draw. Text YES now for your chance to win."
+    },
+    {
+      name: "Personal",
+      text: "Can you send me the notes from today's meeting when you get a chance?"
+    }
+  ];
+
+  type SpamResult = {
+    label: string;
+    spam_probability: number;
+    confidence: number;
+  };
+
+  type SpamHistory = {
+    id: number;
+    text: string;
+    result: SpamResult;
+  };
+
+  const [text, setText] = useState(presets[1].text);
+  const [result, setResult] = useState<SpamResult | null>(null);
+  const [history, setHistory] = useState<SpamHistory[]>([]);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
 
   async function run() {
+    if (!text.trim()) return;
     setBusy(true);
     setError("");
     try {
-      setResult(
-        await api("/api/spam/predict", {
-          method: "POST",
-          body: JSON.stringify({ text })
-        })
-      );
+      const next = await api<SpamResult>("/api/spam/predict", {
+        method: "POST",
+        body: JSON.stringify({ text })
+      });
+      setResult(next);
+      setHistory((items) => [
+        { id: Date.now(), text, result: next },
+        ...items
+      ].slice(0, 5));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Prediction failed.");
     } finally {
@@ -77,68 +178,166 @@ function SpamDemo() {
   }
 
   return (
-    <div className="demo-grid">
-      <div>
-        <label className="field-label" htmlFor="spam-input">SMS text</label>
+    <div className="playground-layout">
+      <section className="input-pane">
+        <div className="toolbar">
+          <div className="preset-group">
+            {presets.map((preset) => (
+              <button
+                key={preset.name}
+                className="control-button"
+                onClick={() => {
+                  setText(preset.text);
+                  setResult(null);
+                }}
+              >
+                {preset.name}
+              </button>
+            ))}
+          </div>
+          <button
+            className="control-button subtle"
+            onClick={() => {
+              setText("");
+              setResult(null);
+            }}
+          >
+            Clear
+          </button>
+        </div>
+
+        <label className="field-label" htmlFor="spam-input">
+          SMS message
+        </label>
         <textarea
           id="spam-input"
           value={text}
           maxLength={5000}
+          spellCheck={false}
           onChange={(event) => setText(event.target.value)}
+          onKeyDown={(event) => {
+            if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+              event.preventDefault();
+              void run();
+            }
+          }}
         />
-        <div className="example-row">
-          <button onClick={() => setText("Call me when you arrive, I'll meet you downstairs.")}>Normal example</button>
-          <button onClick={() => setText("URGENT! You have won a £500 reward. Reply WIN now.")}>Spam example</button>
+        <div className="input-meta">
+          <span>{text.length} / 5000 chars</span>
+          <span>⌘ / Ctrl + Enter to run</span>
         </div>
-        <button className="primary-button" onClick={run} disabled={busy || !text.trim()}>
-          {busy ? "Running…" : "Classify message"}
-        </button>
-      </div>
 
-      <OutputBlock>
+        <RunButton busy={busy} disabled={!text.trim()} onClick={() => void run()}>
+          Classify message
+        </RunButton>
+        {error && <div className="error-banner">{error}</div>}
+
+        <History
+          items={history.map((item) => ({
+            id: item.id,
+            title: item.text.slice(0, 48),
+            detail: item.result.label.toUpperCase(),
+            value: formatPercent(item.result.spam_probability)
+          }))}
+          onSelect={(id) => {
+            const item = history.find((entry) => entry.id === id);
+            if (item) {
+              setText(item.text);
+              setResult(item.result);
+            }
+          }}
+        />
+      </section>
+
+      <section className="result-pane">
+        <div className="panel-heading">
+          <span>Model output</span>
+          <span className="mono-label">TF-IDF · Multinomial NB</span>
+        </div>
+
         {result ? (
-          <>
-            <span className="result-kicker">Prediction</span>
-            <div className="result-title">{result.label.toUpperCase()}</div>
-            <div className="score-line">
-              <span>Spam probability</span>
-              <strong>{formatPercent(result.spam_probability)}</strong>
+          <div className="result-content" key={`${result.label}-${result.spam_probability}`}>
+            <div className="decision-row">
+              <div>
+                <span className="result-caption">Decision</span>
+                <strong className="decision-value">{result.label.toUpperCase()}</strong>
+              </div>
+              <span className={`decision-badge ${result.label === "spam" ? "danger" : "safe"}`}>
+                {formatPercent(result.confidence)} confidence
+              </span>
             </div>
-            <div className="meter"><span style={{ width: formatPercent(result.spam_probability) }} /></div>
-            <p className="quiet">TF-IDF + Multinomial Naive Bayes. Exact-message duplicates are removed before the train/test split.</p>
-          </>
+
+            <ProbabilityRail
+              value={result.spam_probability}
+              label="Spam probability"
+            />
+
+            <div className="explain-list">
+              <div>
+                <span>Input handling</span>
+                <strong>Exact-message deduplication before split</strong>
+              </div>
+              <div>
+                <span>Benchmark</span>
+                <strong>Precision 1.0000 · F1 0.7642</strong>
+              </div>
+            </div>
+          </div>
         ) : (
-          <p className="placeholder">Run the classifier to inspect its probability and decision.</p>
+          <div className="empty-state">
+            <strong>Run a message through the classifier.</strong>
+            <span>The output will show the actual model probability, not a mocked UI state.</span>
+          </div>
         )}
-        {error && <p className="error-text">{error}</p>}
-      </OutputBlock>
+      </section>
     </div>
   );
 }
 
 function TypoDemo() {
-  const [text, setText] = useState("I am lerning pythom with fun");
-  const [result, setResult] = useState<{
+  const presets = [
+    "I am lerning pythom with fun",
+    "machne lerning is usefull",
+    "I realy enjoy programing",
+    "deep lerning modls are powerfull"
+  ];
+
+  type TypoResult = {
+    input: string;
     corrected: string;
     corrections: Array<{
       input: string;
       replacement: string;
       candidates: Array<{ word: string; score: number }>;
     }>;
-  } | null>(null);
+  };
+
+  type TypoHistory = {
+    id: number;
+    input: string;
+    result: TypoResult;
+  };
+
+  const [text, setText] = useState(presets[0]);
+  const [result, setResult] = useState<TypoResult | null>(null);
+  const [history, setHistory] = useState<TypoHistory[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
   async function run() {
+    if (!text.trim()) return;
     setBusy(true);
     setError("");
     try {
-      setResult(
-        await api("/api/t9/correct", {
-          method: "POST",
-          body: JSON.stringify({ text })
-        })
-      );
+      const next = await api<TypoResult>("/api/t9/correct", {
+        method: "POST",
+        body: JSON.stringify({ text })
+      });
+      setResult(next);
+      setHistory((items) => [
+        { id: Date.now(), input: text, result: next },
+        ...items
+      ].slice(0, 5));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Correction failed.");
     } finally {
@@ -147,54 +346,161 @@ function TypoDemo() {
   }
 
   return (
-    <div className="demo-grid">
-      <div>
-        <label className="field-label" htmlFor="typo-input">Input sentence</label>
-        <textarea id="typo-input" value={text} onChange={(event) => setText(event.target.value)} />
-        <button className="primary-button" onClick={run} disabled={busy || !text.trim()}>
-          {busy ? "Ranking…" : "Correct sentence"}
-        </button>
-      </div>
+    <div className="playground-layout">
+      <section className="input-pane">
+        <div className="toolbar">
+          <div className="preset-group">
+            {presets.map((preset, index) => (
+              <button
+                key={preset}
+                className="control-button"
+                onClick={() => {
+                  setText(preset);
+                  setResult(null);
+                }}
+              >
+                Example {index + 1}
+              </button>
+            ))}
+          </div>
+          <button
+            className="control-button subtle"
+            onClick={() => {
+              setText("");
+              setResult(null);
+            }}
+          >
+            Clear
+          </button>
+        </div>
 
-      <OutputBlock>
+        <label className="field-label" htmlFor="typo-input">
+          Sentence
+        </label>
+        <textarea
+          id="typo-input"
+          value={text}
+          spellCheck={false}
+          onChange={(event) => setText(event.target.value)}
+          onKeyDown={(event) => {
+            if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+              event.preventDefault();
+              void run();
+            }
+          }}
+        />
+
+        <RunButton busy={busy} disabled={!text.trim()} onClick={() => void run()}>
+          Rank corrections
+        </RunButton>
+        {error && <div className="error-banner">{error}</div>}
+
+        <History
+          items={history.map((item) => ({
+            id: item.id,
+            title: item.input,
+            detail: `${item.result.corrections.length} correction(s)`,
+            value: item.result.corrected.slice(0, 34)
+          }))}
+          onSelect={(id) => {
+            const item = history.find((entry) => entry.id === id);
+            if (item) {
+              setText(item.input);
+              setResult(item.result);
+            }
+          }}
+        />
+      </section>
+
+      <section className="result-pane">
+        <div className="panel-heading">
+          <span>Ranked candidates</span>
+          <span className="mono-label">Levenshtein · deterministic scoring</span>
+        </div>
+
         {result ? (
-          <>
-            <span className="result-kicker">Corrected</span>
-            <div className="result-title sentence">{result.corrected}</div>
-            <div className="candidate-list">
-              {result.corrections.map((item) => (
-                <div className="candidate-item" key={item.input}>
-                  <div>
-                    <span className="mono">{item.input}</span>
-                    <span className="arrow">→</span>
-                    <strong>{item.replacement}</strong>
-                  </div>
-                  <span className="quiet">
-                    {item.candidates.map((candidate) => `${candidate.word} · ${candidate.score}`).join("  /  ")}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </>
+          <div className="result-content" key={result.corrected}>
+            <div className="corrected-sentence">{result.corrected}</div>
+
+            {result.corrections.length ? (
+              <div className="correction-stack">
+                {result.corrections.map((item) => {
+                  const maxScore = Math.max(
+                    ...item.candidates.map((candidate) => candidate.score),
+                    0.0001
+                  );
+
+                  return (
+                    <div className="correction-block" key={item.input}>
+                      <div className="correction-title">
+                        <span className="mono-word">{item.input}</span>
+                        <span>→</span>
+                        <strong>{item.replacement}</strong>
+                      </div>
+                      <div className="candidate-stack">
+                        {item.candidates.map((candidate, index) => (
+                          <div className="candidate-row" key={candidate.word}>
+                            <span className="candidate-rank">{index + 1}</span>
+                            <span>{candidate.word}</span>
+                            <div className="candidate-bar">
+                              <span
+                                style={{
+                                  width: formatPercent(
+                                    clamp(candidate.score / maxScore),
+                                    2
+                                  )
+                                }}
+                              />
+                            </div>
+                            <strong>{candidate.score.toFixed(3)}</strong>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="inline-note">No corrections were required.</div>
+            )}
+          </div>
         ) : (
-          <p className="placeholder">The live demo exposes the same deterministic candidate-ranking code evaluated in the project.</p>
+          <div className="empty-state">
+            <strong>Try a misspelled sentence.</strong>
+            <span>You will see the selected replacement and the real ranked candidate list.</span>
+          </div>
         )}
-        {error && <p className="error-text">{error}</p>}
-      </OutputBlock>
+      </section>
     </div>
   );
 }
 
 type RecordExamples = Record<string, Record<string, unknown>>;
 
-function RecordDemo({
-  kind
-}: {
-  kind: "fraud" | "credit";
-}) {
+type RecordPrediction = {
+  fraud_probability?: number;
+  repayment_probability?: number;
+  threshold?: number;
+  prediction?: number;
+  risk_band?: string;
+  model_note?: string;
+  benchmark?: Record<string, number>;
+};
+
+function RecordDemo({ kind }: { kind: "fraud" | "credit" }) {
   const [examples, setExamples] = useState<RecordExamples | null>(null);
+  const [selectedPreset, setSelectedPreset] = useState("");
   const [record, setRecord] = useState<Record<string, unknown> | null>(null);
-  const [result, setResult] = useState<Record<string, unknown> | null>(null);
+  const [result, setResult] = useState<RecordPrediction | null>(null);
+  const [history, setHistory] = useState<
+    Array<{
+      id: number;
+      preset: string;
+      probability: number;
+      record: Record<string, unknown>;
+      result: RecordPrediction;
+    }>
+  >([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
 
@@ -203,24 +509,70 @@ function RecordDemo({
     api<RecordExamples>(`/api/${kind}/examples`)
       .then((data) => {
         setExamples(data);
-        setRecord(Object.values(data)[0] ?? null);
+        const first = Object.entries(data)[0];
+        if (first) {
+          setSelectedPreset(first[0]);
+          setRecord({ ...first[1] });
+        }
       })
-      .catch((err) => setError(err instanceof Error ? err.message : "Unable to load demo records."));
+      .catch((err) => {
+        setError(
+          err instanceof Error ? err.message : "Unable to load example records."
+        );
+      });
   }, [kind]);
 
-  const title = kind === "fraud" ? "Transaction risk" : "Repayment probability";
+  function choosePreset(name: string, value: Record<string, unknown>) {
+    setSelectedPreset(name);
+    setRecord({ ...value });
+    setResult(null);
+  }
+
+  function resetPreset() {
+    if (!examples || !selectedPreset || !examples[selectedPreset]) return;
+    setRecord({ ...examples[selectedPreset] });
+    setResult(null);
+  }
+
+  function updateField(key: string, raw: string) {
+    setRecord((current) => {
+      if (!current) return current;
+      const previous = current[key];
+      let value: unknown = raw;
+      if (typeof previous === "number") {
+        const parsed = Number(raw);
+        value = Number.isNaN(parsed) ? previous : parsed;
+      }
+      return { ...current, [key]: value };
+    });
+  }
 
   async function run() {
     if (!record) return;
     setBusy(true);
     setError("");
     try {
-      setResult(
-        await api(`/api/${kind}/predict`, {
-          method: "POST",
-          body: JSON.stringify({ record })
-        })
-      );
+      const next = await api<RecordPrediction>(`/api/${kind}/predict`, {
+        method: "POST",
+        body: JSON.stringify({ record })
+      });
+      setResult(next);
+
+      const probability =
+        typeof next.fraud_probability === "number"
+          ? next.fraud_probability
+          : next.repayment_probability ?? 0;
+
+      setHistory((items) => [
+        {
+          id: Date.now(),
+          preset: selectedPreset || "edited",
+          probability,
+          record: { ...record },
+          result: next
+        },
+        ...items
+      ].slice(0, 5));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Prediction failed.");
     } finally {
@@ -235,81 +587,270 @@ function RecordDemo({
         ? result.repayment_probability
         : null;
 
+  const marker =
+    kind === "fraud"
+      ? result?.threshold
+      : 0.5;
+
   return (
-    <div className="demo-grid">
-      <div>
-        <span className="field-label">Synthetic example record</span>
-        <div className="example-row">
-          {examples &&
-            Object.entries(examples).map(([name, value]) => (
-              <button
-                key={name}
-                className={record === value ? "selected" : ""}
-                onClick={() => {
-                  setRecord(value);
-                  setResult(null);
-                }}
-              >
-                {name.replaceAll("_", " ")}
-              </button>
-            ))}
+    <div className="playground-layout record-playground">
+      <section className="input-pane">
+        <div className="toolbar">
+          <div className="preset-group">
+            {examples &&
+              Object.entries(examples).map(([name, value]) => (
+                <button
+                  key={name}
+                  className={`control-button ${selectedPreset === name ? "selected" : ""}`}
+                  onClick={() => choosePreset(name, value)}
+                >
+                  {name.replaceAll("_", " ")}
+                </button>
+              ))}
+          </div>
+          <button className="control-button subtle" onClick={resetPreset}>
+            Reset values
+          </button>
         </div>
 
-        <div className="record-grid">
+        <div className="subsection-title">Editable model input</div>
+        <div className="field-editor">
           {record &&
-            Object.entries(record).slice(0, 12).map(([key, value]) => (
-              <div key={key}>
+            Object.entries(record).map(([key, value]) => (
+              <label className="record-field" key={key}>
                 <span>{key.replaceAll("_", " ")}</span>
-                <strong>{String(value)}</strong>
-              </div>
+                <input
+                  value={String(value ?? "")}
+                  type={typeof value === "number" ? "number" : "text"}
+                  step={typeof value === "number" ? "any" : undefined}
+                  onChange={(event) => updateField(key, event.target.value)}
+                />
+              </label>
             ))}
         </div>
 
-        <button className="primary-button" onClick={run} disabled={busy || !record}>
-          {busy ? "Fitting demo model…" : `Analyze ${kind === "fraud" ? "transaction" : "customer"}`}
-        </button>
-        <p className="quiet compact">
-          First run lazily fits the selected Random Forest configuration on the full synthetic dataset for demo inference.
-        </p>
-      </div>
+        <RunButton busy={busy} disabled={!record} onClick={() => void run()}>
+          {kind === "fraud" ? "Score transaction" : "Score customer"}
+        </RunButton>
+        <div className="inline-note">
+          The first request may take a moment while the selected Random Forest configuration is fitted for interactive inference.
+        </div>
+        {error && <div className="error-banner">{error}</div>}
 
-      <OutputBlock>
+        <History
+          items={history.map((item) => ({
+            id: item.id,
+            title: item.preset.replaceAll("_", " "),
+            detail: String(item.result.risk_band ?? "scored").toUpperCase(),
+            value: formatPercent(item.probability)
+          }))}
+          onSelect={(id) => {
+            const item = history.find((entry) => entry.id === id);
+            if (item) {
+              setRecord({ ...item.record });
+              setResult(item.result);
+            }
+          }}
+        />
+      </section>
+
+      <section className="result-pane">
+        <div className="panel-heading">
+          <span>{kind === "fraud" ? "Transaction risk" : "Repayment score"}</span>
+          <span className="mono-label">Random Forest · sklearn Pipeline</span>
+        </div>
+
         {result && probability !== null ? (
-          <>
-            <span className="result-kicker">{title}</span>
-            <div className="result-title">{formatPercent(probability)}</div>
-            <div className="score-line">
-              <span>Decision</span>
-              <strong>{String(result.risk_band).toUpperCase()}</strong>
+          <div className="result-content" key={probability}>
+            <div className="decision-row">
+              <div>
+                <span className="result-caption">Probability</span>
+                <strong className="decision-value">{formatPercent(probability)}</strong>
+              </div>
+              <span className="decision-badge neutral">
+                {String(result.risk_band ?? "scored").toUpperCase()}
+              </span>
             </div>
-            <div className="meter"><span style={{ width: formatPercent(probability) }} /></div>
-            <p className="quiet">{String(result.model_note)}</p>
-          </>
+
+            <ProbabilityRail
+              value={probability}
+              marker={marker}
+              label={kind === "fraud" ? "Fraud probability" : "Repayment probability"}
+            />
+
+            {typeof marker === "number" && (
+              <div className="threshold-readout">
+                <span>Decision threshold</span>
+                <strong>{marker.toFixed(3)}</strong>
+              </div>
+            )}
+
+            {result.benchmark && (
+              <div className="benchmark-table">
+                {Object.entries(result.benchmark).map(([metric, value]) => (
+                  <div key={metric}>
+                    <span>{metric.replaceAll("_", " ")}</span>
+                    <strong>{Number(value).toFixed(4)}</strong>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div className="inline-note">
+              Benchmark metrics come from the held-out test split; this playground result does not overwrite them.
+            </div>
+          </div>
         ) : (
-          <p className="placeholder">Choose an example and run the real sklearn pipeline. Benchmark metrics remain isolated from demo inference.</p>
+          <div className="empty-state">
+            <strong>Edit a real example record, then score it.</strong>
+            <span>
+              Inputs are sent to the same preprocessing + model pipeline used by the project code.
+            </span>
+          </div>
         )}
-        {error && <p className="error-text">{error}</p>}
-      </OutputBlock>
+      </section>
+    </div>
+  );
+}
+
+function RAGScorePlot({
+  records,
+  threshold,
+  selectedId,
+  onSelect
+}: {
+  records: CalibrationRecord[];
+  threshold: number;
+  selectedId: number | null;
+  onSelect: (id: number) => void;
+}) {
+  return (
+    <div className="score-plot">
+      <div
+        className="plot-threshold"
+        style={{ left: formatPercent(threshold, 2) }}
+      >
+        <span>{threshold.toFixed(3)}</span>
+      </div>
+      <div className="plot-lane">
+        <span className="plot-lane-label">Answerable</span>
+        <div className="plot-track">
+          {records
+            .filter((record) => record.answerable)
+            .map((record) => (
+              <button
+                key={record.id}
+                className={`plot-dot answerable ${selectedId === record.id ? "selected" : ""}`}
+                style={{ left: formatPercent(record.top_score, 2) }}
+                title={`${record.question} — ${record.top_score.toFixed(3)}`}
+                onClick={() => onSelect(record.id)}
+              />
+            ))}
+        </div>
+      </div>
+      <div className="plot-lane">
+        <span className="plot-lane-label">Unsupported</span>
+        <div className="plot-track">
+          {records
+            .filter((record) => !record.answerable)
+            .map((record) => (
+              <button
+                key={record.id}
+                className={`plot-dot unsupported ${selectedId === record.id ? "selected" : ""}`}
+                style={{ left: formatPercent(record.top_score, 2) }}
+                title={`${record.question} — ${record.top_score.toFixed(3)}`}
+                onClick={() => onSelect(record.id)}
+              />
+            ))}
+        </div>
+      </div>
+      <div className="plot-axis">
+        <span>0.0</span>
+        <span>0.25</span>
+        <span>0.5</span>
+        <span>0.75</span>
+        <span>1.0</span>
+      </div>
     </div>
   );
 }
 
 function RAGDemo() {
   const [evaluation, setEvaluation] = useState<RAGEvaluation | null>(null);
-  const [status, setStatus] = useState<{ available: boolean; configured: boolean; detail?: string } | null>(null);
-  const [question, setQuestion] = useState("How many days per week can I work remotely?");
+  const [status, setStatus] = useState<{
+    available: boolean;
+    configured: boolean;
+    detail?: string;
+  } | null>(null);
+  const [threshold, setThreshold] = useState(0.6);
+  const [filter, setFilter] = useState<"all" | "answerable" | "unsupported">("all");
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [question, setQuestion] = useState(
+    "How many days per week can I work remotely?"
+  );
   const [answer, setAnswer] = useState<Record<string, unknown> | null>(null);
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     void Promise.all([
-      api<RAGEvaluation>("/api/rag/evaluation").then(setEvaluation),
-      api<{ available: boolean; configured: boolean; detail?: string }>("/api/rag/status").then(setStatus)
-    ]);
+      api<RAGEvaluation>("/api/rag/evaluation").then((data) => {
+        setEvaluation(data);
+        setThreshold(data.abstention.threshold);
+        setSelectedId(data.calibration_records[0]?.id ?? null);
+      }),
+      api<{ available: boolean; configured: boolean; detail?: string }>(
+        "/api/rag/status"
+      ).then(setStatus)
+    ]).catch((err) => {
+      setError(err instanceof Error ? err.message : "Unable to load RAG evaluation.");
+    });
   }, []);
 
-  async function run() {
+  const simulated = useMemo(() => {
+    if (!evaluation) return null;
+
+    const answerable = evaluation.calibration_records.filter(
+      (record) => record.answerable
+    );
+    const unsupported = evaluation.calibration_records.filter(
+      (record) => !record.answerable
+    );
+
+    const answerableRecall =
+      answerable.filter((record) => record.top_score >= threshold).length /
+      Math.max(answerable.length, 1);
+
+    const unsupportedRecall =
+      unsupported.filter((record) => record.top_score < threshold).length /
+      Math.max(unsupported.length, 1);
+
+    return {
+      answerableRecall,
+      unsupportedRecall,
+      balancedAccuracy: (answerableRecall + unsupportedRecall) / 2
+    };
+  }, [evaluation, threshold]);
+
+  const visibleRecords = useMemo(() => {
+    if (!evaluation) return [];
+    return evaluation.calibration_records
+      .filter((record) => {
+        if (filter === "answerable") return record.answerable;
+        if (filter === "unsupported") return !record.answerable;
+        return true;
+      })
+      .sort((left, right) => right.top_score - left.top_score);
+  }, [evaluation, filter]);
+
+  const selectedRecord =
+    evaluation?.calibration_records.find((record) => record.id === selectedId) ??
+    null;
+
+  async function runLive() {
+    if (!status?.available || !question.trim()) return;
     setBusy(true);
+    setError("");
     try {
       setAnswer(
         await api("/api/rag/ask", {
@@ -317,216 +858,439 @@ function RAGDemo() {
           body: JSON.stringify({ question, top_k: 3 })
         })
       );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "RAG request failed.");
     } finally {
       setBusy(false);
     }
   }
 
   return (
-    <div className="demo-grid">
-      <div>
-        <div className="rag-status">
-          <span className="status-dot" data-live={Boolean(status?.available)} />
-          <span>{status?.available ? "Local generation connected" : "Evaluation mode"}</span>
+    <div className="rag-workbench">
+      <section className="rag-control-pane">
+        <div className="panel-heading">
+          <span>Retrieval threshold simulator</span>
+          <span className="mono-label">
+            {evaluation ? `${evaluation.calibration_records.length} labeled queries` : "loading"}
+          </span>
         </div>
 
-        <label className="field-label" htmlFor="rag-question">Question</label>
-        <textarea id="rag-question" value={question} onChange={(event) => setQuestion(event.target.value)} />
-        <button className="primary-button" onClick={run} disabled={!status?.available || busy || !question.trim()}>
-          {status?.available ? (busy ? "Retrieving…" : "Ask knowledge base") : "Start optional RAG service to query"}
-        </button>
-        {!status?.available && (
-          <p className="quiet compact">
-            Retrieval evaluation is always available. Live generation is intentionally separated and only enabled when the local Qwen/Ollama service is running.
-          </p>
-        )}
-      </div>
+        {evaluation && simulated ? (
+          <>
+            <div className="threshold-controls">
+              <div className="threshold-header">
+                <div>
+                  <span className="result-caption">Current threshold</span>
+                  <strong>{threshold.toFixed(3)}</strong>
+                </div>
+                <div className="button-row">
+                  <button
+                    className="control-button"
+                    onClick={() =>
+                      setThreshold(
+                        clamp(evaluation.abstention.threshold - 0.05)
+                      )
+                    }
+                  >
+                    More permissive
+                  </button>
+                  <button
+                    className="control-button selected"
+                    onClick={() => setThreshold(evaluation.abstention.threshold)}
+                  >
+                    Calibrated
+                  </button>
+                  <button
+                    className="control-button"
+                    onClick={() =>
+                      setThreshold(
+                        clamp(evaluation.abstention.threshold + 0.05)
+                      )
+                    }
+                  >
+                    Stricter
+                  </button>
+                </div>
+              </div>
 
-      <OutputBlock>
-        {answer ? (
-          <>
-            <span className="result-kicker">Answer</span>
-            <div className="answer-text">{String(answer.answer)}</div>
-          </>
-        ) : evaluation ? (
-          <>
-            <span className="result-kicker">Committed evaluation</span>
-            <div className="evaluation-grid">
-              <div><span>Hit@1</span><strong>{formatPercent(evaluation.retrieval.hit_at_1)}</strong></div>
-              <div><span>Hit@3</span><strong>{formatPercent(evaluation.retrieval.hit_at_3)}</strong></div>
-              <div><span>MRR@3</span><strong>{evaluation.retrieval.mrr_at_3.toFixed(4)}</strong></div>
-              <div><span>Abstention threshold</span><strong>{evaluation.abstention.threshold.toFixed(5)}</strong></div>
+              <input
+                className="threshold-slider"
+                type="range"
+                min="0"
+                max="1"
+                step="0.005"
+                value={threshold}
+                onChange={(event) => setThreshold(Number(event.target.value))}
+              />
             </div>
-            <p className="quiet">
-              Threshold balanced accuracy: {formatPercent(evaluation.abstention.balanced_accuracy)}. It remains opt-in because the calibration set is intentionally small.
-            </p>
+
+            <div className="sim-metrics">
+              <div>
+                <span>Balanced accuracy</span>
+                <strong>{formatPercent(simulated.balancedAccuracy)}</strong>
+              </div>
+              <div>
+                <span>Answerable recall</span>
+                <strong>{formatPercent(simulated.answerableRecall)}</strong>
+              </div>
+              <div>
+                <span>Unsupported recall</span>
+                <strong>{formatPercent(simulated.unsupportedRecall)}</strong>
+              </div>
+            </div>
+
+            <RAGScorePlot
+              records={evaluation.calibration_records}
+              threshold={threshold}
+              selectedId={selectedId}
+              onSelect={setSelectedId}
+            />
+
+            {selectedRecord && (
+              <div className="selected-query">
+                <span className="result-caption">Selected calibration query</span>
+                <strong>{selectedRecord.question}</strong>
+                <div className="selected-query-meta">
+                  <span>score {selectedRecord.top_score.toFixed(3)}</span>
+                  <span>
+                    expected {selectedRecord.answerable ? "ANSWERABLE" : "UNSUPPORTED"}
+                  </span>
+                  <span
+                    className={
+                      selectedRecord.top_score >= threshold
+                        ? "action-answer"
+                        : "action-abstain"
+                    }
+                  >
+                    current action{" "}
+                    {selectedRecord.top_score >= threshold ? "ANSWER" : "ABSTAIN"}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <div className="filter-row">
+              {(["all", "answerable", "unsupported"] as const).map((value) => (
+                <button
+                  key={value}
+                  className={`control-button ${filter === value ? "selected" : ""}`}
+                  onClick={() => setFilter(value)}
+                >
+                  {value}
+                </button>
+              ))}
+            </div>
+
+            <div className="query-table">
+              {visibleRecords.map((record) => (
+                <button
+                  key={record.id}
+                  className={`query-row ${selectedId === record.id ? "selected" : ""}`}
+                  onClick={() => {
+                    setSelectedId(record.id);
+                    setQuestion(record.question);
+                  }}
+                >
+                  <span className="query-kind">
+                    {record.answerable ? "answerable" : "unsupported"}
+                  </span>
+                  <span className="query-text">{record.question}</span>
+                  <strong>{formatScore(record.top_score)}</strong>
+                  <span
+                    className={
+                      record.top_score >= threshold
+                        ? "action-answer"
+                        : "action-abstain"
+                    }
+                  >
+                    {record.top_score >= threshold ? "answer" : "abstain"}
+                  </span>
+                </button>
+              ))}
+            </div>
           </>
         ) : (
-          <p className="placeholder">Loading evaluation artifact…</p>
+          <div className="empty-state">
+            <strong>Loading evaluation snapshot…</strong>
+          </div>
         )}
-      </OutputBlock>
+      </section>
+
+      <section className="rag-live-pane">
+        <div className="panel-heading">
+          <span>Generation</span>
+          <span className={`service-state ${status?.available ? "online" : "eval"}`}>
+            {status?.available ? "LIVE" : "EVAL ONLY"}
+          </span>
+        </div>
+
+        <label className="field-label" htmlFor="rag-question">
+          Question
+        </label>
+        <textarea
+          id="rag-question"
+          value={question}
+          onChange={(event) => setQuestion(event.target.value)}
+        />
+
+        <RunButton
+          busy={busy}
+          disabled={!status?.available || !question.trim()}
+          onClick={() => void runLive()}
+        >
+          Ask knowledge base
+        </RunButton>
+
+        {!status?.available && (
+          <div className="inline-note">
+            Public hosting keeps the heavy Qwen/Ollama runtime disabled. The retrieval and abstention simulator above uses the committed real evaluation scores and stays fully interactive.
+          </div>
+        )}
+
+        {answer && (
+          <div className="live-answer">
+            <span className="result-caption">Answer</span>
+            <p>{String(answer.answer ?? "")}</p>
+          </div>
+        )}
+
+        {evaluation && (
+          <div className="benchmark-table">
+            <div>
+              <span>Hit@1</span>
+              <strong>{formatPercent(evaluation.retrieval.hit_at_1)}</strong>
+            </div>
+            <div>
+              <span>Hit@3</span>
+              <strong>{formatPercent(evaluation.retrieval.hit_at_3)}</strong>
+            </div>
+            <div>
+              <span>MRR@3</span>
+              <strong>{evaluation.retrieval.mrr_at_3.toFixed(4)}</strong>
+            </div>
+            <div>
+              <span>Calibrated threshold</span>
+              <strong>{evaluation.abstention.threshold.toFixed(5)}</strong>
+            </div>
+          </div>
+        )}
+
+        {error && <div className="error-banner">{error}</div>}
+      </section>
     </div>
   );
 }
 
-function LiveLab({
-  active,
-  setActive
+function SystemHeader({
+  model,
+  copied,
+  onCopy
 }: {
-  active: DemoTab;
-  setActive: (tab: DemoTab) => void;
+  model: ModelInfo;
+  copied: boolean;
+  onCopy: () => void;
 }) {
   return (
-    <section className="section" id="lab">
-      <div className="section-heading">
-        <span className="eyebrow">Interactive inference</span>
-        <h2>Live lab</h2>
-        <p>One interface over independently evaluated systems. Demo behavior is separated from benchmark claims.</p>
-      </div>
-
-      <div className="lab-shell">
-        <div className="tab-bar" role="tablist">
-          {tabs.map((tab) => (
-            <button key={tab} className={active === tab ? "active" : ""} onClick={() => setActive(tab)}>
-              {tab === "typo" ? "T9" : tab.toUpperCase()}
-            </button>
+    <div className="system-header">
+      <div>
+        <div className="system-kicker">
+          <span className={`service-state ${model.live ? "online" : "eval"}`}>
+            {model.live ? "LIVE" : "EVAL"}
+          </span>
+          <span>{model.task}</span>
+          <span>{model.data_scope}</span>
+        </div>
+        <h1>{model.name}</h1>
+        <p>{model.description}</p>
+        <div className="tech-line">
+          {model.technology.map((item) => (
+            <span key={item}>{item}</span>
           ))}
         </div>
+      </div>
 
-        <div className="lab-body">
-          {active === "spam" && <SpamDemo />}
-          {active === "typo" && <TypoDemo />}
-          {active === "fraud" && <RecordDemo kind="fraud" />}
-          {active === "credit" && <RecordDemo kind="credit" />}
-          {active === "rag" && <RAGDemo />}
+      <div className="system-summary">
+        <div>
+          <span>{model.headline_metric}</span>
+          <strong>{model.headline_value}</strong>
+        </div>
+        <div>
+          <span>Secondary</span>
+          <strong>{model.secondary_metric}</strong>
         </div>
       </div>
-    </section>
+
+      <div className="system-actions">
+        <button className="utility-button" onClick={onCopy}>
+          {copied ? "Copied" : "Copy endpoint"}
+        </button>
+        <a
+          className="utility-button"
+          href={`${GITHUB}/tree/main/${model.repo_path}`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Source ↗
+        </a>
+        <a
+          className="utility-button"
+          href="/docs"
+          target="_blank"
+          rel="noreferrer"
+        >
+          API docs ↗
+        </a>
+      </div>
+    </div>
   );
 }
 
 function App() {
   const [overview, setOverview] = useState<Overview | null>(null);
-  const [active, setActive] = useState<DemoTab>("spam");
+  const [active, setActive] = useState<ModelId>("spam");
+  const [copied, setCopied] = useState(false);
+  const [loadError, setLoadError] = useState("");
 
   useEffect(() => {
-    api<Overview>("/api/overview").then(setOverview).catch(() => setOverview(null));
+    api<Overview>("/api/overview")
+      .then(setOverview)
+      .catch((err) => {
+        setLoadError(
+          err instanceof Error ? err.message : "Unable to connect to the API."
+        );
+      });
   }, []);
 
-  const modelMap = useMemo(
-    () => new Map(overview?.models.map((model) => [model.id, model]) ?? []),
-    [overview]
-  );
+  const models = useMemo(() => {
+    const byId = new Map(
+      (overview?.models ?? []).map((model) => [model.id, model])
+    );
+    return serviceOrder
+      .map((id) => byId.get(id))
+      .filter((model): model is ModelInfo => Boolean(model));
+  }, [overview]);
 
-  function openModel(id: ModelInfo["id"]) {
-    if (id === "typo") setActive("typo");
-    else setActive(id);
-    document.getElementById("lab")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const activeModel =
+    models.find((model) => model.id === active) ??
+    overview?.models.find((model) => model.id === active) ??
+    null;
+
+  async function copyEndpoint() {
+    if (!activeModel) return;
+    const endpoint = `${window.location.origin}${endpointByModel[activeModel.id]}`;
+    await navigator.clipboard.writeText(endpoint);
+    setCopied(true);
+    window.setTimeout(() => setCopied(false), 1200);
   }
 
   return (
-    <div className="site-shell">
-      <header className="topbar">
-        <a className="brand" href="#top">
-          <span className="brand-mark">ML</span>
-          <span>Systems Lab</span>
-        </a>
-        <nav>
-          <a href="#systems">Systems</a>
-          <a href="#lab">Live lab</a>
-          <a href="#architecture">Architecture</a>
-          <a href={GITHUB} target="_blank" rel="noreferrer">GitHub ↗</a>
-        </nav>
+    <div className="app-shell">
+      <header className="app-header">
+        <div className="app-identity">
+          <span className="wordmark">ML Systems Lab</span>
+          <span className="header-divider" />
+          <span className="header-subtitle">interactive inference & evaluation</span>
+        </div>
+        <div className="header-actions">
+          <span className={`api-health ${overview ? "online" : ""}`}>
+            <span />
+            {overview ? "API online" : "connecting"}
+          </span>
+          <a href={ACTIONS} target="_blank" rel="noreferrer">
+            CI
+          </a>
+          <a href={GITHUB} target="_blank" rel="noreferrer">
+            GitHub ↗
+          </a>
+        </div>
       </header>
 
-      <main id="top">
-        <section className="hero">
-          <div className="hero-copy">
-            <span className="eyebrow">ML engineering portfolio</span>
-            <h1>Models that leave the notebook.</h1>
-            <p>
-              Five independently evaluated ML systems exposed through a unified API and one restrained interface —
-              with tests, Docker, CI and reproducible metrics.
-            </p>
-            <div className="hero-actions">
-              <a className="primary-link" href="#lab">Open live lab</a>
-              <a className="secondary-link" href={GITHUB} target="_blank" rel="noreferrer">Inspect repository</a>
-            </div>
-          </div>
-
-          <div className="proof-panel">
-            <div><strong>{overview?.systems ?? 5}</strong><span>ML systems</span></div>
-            <div><strong>2</strong><span>API services</span></div>
-            <div><strong>CI</strong><span>quality gates</span></div>
-            <div><strong>JSON</strong><span>metric artifacts</span></div>
-          </div>
-        </section>
-
-        <section className="section" id="systems">
-          <div className="section-heading">
-            <span className="eyebrow">Selected systems</span>
-            <h2>Different tasks, one engineering standard.</h2>
-            <p>Metrics below come from committed evaluation artifacts, not from the interactive demo session.</p>
-          </div>
-
-          <div className="model-grid">
-            {(overview?.models ?? []).map((model) => (
-              <ModelCard key={model.id} model={model} onOpen={() => openModel(model.id)} />
+      <div className="workbench">
+        <aside className="service-sidebar">
+          <div className="sidebar-label">Systems</div>
+          <nav className="service-list">
+            {models.map((model, index) => (
+              <button
+                key={model.id}
+                className={`service-button ${active === model.id ? "active" : ""}`}
+                onClick={() => {
+                  setActive(model.id);
+                  setCopied(false);
+                }}
+              >
+                <span className="service-index">0{index + 1}</span>
+                <span className="service-button-copy">
+                  <strong>{model.name}</strong>
+                  <small>{model.task}</small>
+                </span>
+                <span className="service-metric">{model.headline_value}</span>
+              </button>
             ))}
-            {!overview && (
-              <div className="api-offline">
-                <strong>API not connected.</strong>
-                <span>Run the full stack with <code>docker compose up --build</code>.</span>
+          </nav>
+
+          <div className="sidebar-footer">
+            <div>
+              <span>Quality gates</span>
+              <strong>{overview?.quality.ci ? "passing" : "—"}</strong>
+            </div>
+            <div>
+              <span>Metric artifacts</span>
+              <strong>{overview?.quality.reproducible_metrics ? "committed" : "—"}</strong>
+            </div>
+          </div>
+        </aside>
+
+        <main className="main-console">
+          {loadError && (
+            <div className="error-banner top-error">
+              {loadError}
+            </div>
+          )}
+
+          {activeModel ? (
+            <div className="system-view" key={activeModel.id}>
+              <SystemHeader
+                model={activeModel}
+                copied={copied}
+                onCopy={() => void copyEndpoint()}
+              />
+
+              <div className="console-divider" />
+
+              {active === "spam" && <SpamDemo />}
+              {active === "typo" && <TypoDemo />}
+              {active === "fraud" && <RecordDemo kind="fraud" />}
+              {active === "credit" && <RecordDemo kind="credit" />}
+              {active === "rag" && <RAGDemo />}
+
+              <div className="evidence-strip">
+                <div>
+                  <span>Evaluation</span>
+                  <strong>held-out / committed</strong>
+                </div>
+                <div>
+                  <span>Tests</span>
+                  <strong>pytest + API contracts</strong>
+                </div>
+                <div>
+                  <span>Serving</span>
+                  <strong>FastAPI + Docker</strong>
+                </div>
+                <div>
+                  <span>Security</span>
+                  <strong>pinned deps + audit</strong>
+                </div>
               </div>
-            )}
-          </div>
-        </section>
-
-        <LiveLab active={active} setActive={setActive} />
-
-        <section className="section" id="architecture">
-          <div className="section-heading">
-            <span className="eyebrow">System design</span>
-            <h2>One product surface, explicit model boundaries.</h2>
-            <p>The web app never imports model code. A typed FastAPI layer owns inference and delegates the heavy RAG runtime to an optional service.</p>
-          </div>
-
-          <div className="architecture">
-            <div className="arch-node featured">
-              <span>Interface</span>
-              <strong>React / Vite</strong>
-              <small>single recruiter-facing product surface</small>
             </div>
-            <div className="arch-arrow">↓</div>
-            <div className="arch-node featured">
-              <span>Gateway</span>
-              <strong>Unified FastAPI</strong>
-              <small>typed contracts · model registry · inference adapters</small>
+          ) : (
+            <div className="loading-console">
+              <span className="loading-line" />
+              <span className="loading-line short" />
+              <span className="loading-panel" />
             </div>
-            <div className="arch-arrow">↓</div>
-            <div className="arch-grid">
-              <div className="arch-node"><strong>Fraud</strong><small>sklearn pipeline</small></div>
-              <div className="arch-node"><strong>Credit</strong><small>sklearn pipeline</small></div>
-              <div className="arch-node"><strong>Spam</strong><small>joblib inference</small></div>
-              <div className="arch-node"><strong>T9</strong><small>candidate ranking</small></div>
-              <div className="arch-node"><strong>RAG</strong><small>optional FAISS + Qwen service</small></div>
-            </div>
-          </div>
-
-          <div className="engineering-grid">
-            <div><span>Evaluation</span><strong>Held-out metrics + machine-readable snapshots</strong></div>
-            <div><span>Quality</span><strong>Ruff · pytest · compile checks · vulnerability audit</strong></div>
-            <div><span>Serving</span><strong>FastAPI · Docker · health checks · smoke tests</strong></div>
-            <div><span>RAG controls</span><strong>Pinned embeddings · abstention · metric drift gate</strong></div>
-          </div>
-        </section>
-      </main>
-
-      <footer>
-        <span>ML Systems Lab</span>
-        <span>Python 3.12 · React · FastAPI · Docker</span>
-        <a href={GITHUB} target="_blank" rel="noreferrer">Source ↗</a>
-      </footer>
+          )}
+        </main>
+      </div>
     </div>
   );
 }
