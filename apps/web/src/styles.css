@@ -96,25 +96,12 @@ code,
 
 .app-identity {
   min-width: 0;
-  gap: 12px;
 }
 
 .wordmark {
   font-size: 14px;
   font-weight: 650;
   letter-spacing: -0.02em;
-  white-space: nowrap;
-}
-
-.header-divider {
-  width: 1px;
-  height: 18px;
-  background: var(--line);
-}
-
-.header-subtitle {
-  color: var(--muted);
-  font-size: 12px;
   white-space: nowrap;
 }
 
@@ -337,14 +324,20 @@ code,
 }
 
 .utility-button {
-  min-height: 32px;
-  padding: 0 10px;
+  min-height: 28px;
+  padding: 0;
+  border: 0;
+  background: transparent;
   display: inline-flex;
   align-items: center;
+  color: var(--muted);
   font-size: 11px;
 }
 
-.utility-button:hover,
+.utility-button:hover {
+  color: var(--text);
+}
+
 .control-button:hover {
   color: var(--text);
   border-color: #465361;
@@ -574,30 +567,24 @@ textarea:focus,
 }
 
 .decision-badge {
-  min-height: 24px;
-  padding: 0 8px;
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--line);
-  border-radius: 5px;
+  color: var(--muted);
   font-family: "SFMono-Regular", Consolas, monospace;
   font-size: 9px;
-  font-weight: 650;
+  font-weight: 600;
 }
 
 .decision-badge.safe {
-  border-color: rgba(63, 185, 80, 0.32);
   color: #7dce8e;
 }
 
 .decision-badge.danger {
-  border-color: rgba(248, 81, 73, 0.32);
   color: #ff938d;
 }
 
 .decision-badge.neutral {
-  border-color: rgba(88, 166, 255, 0.28);
-  color: #80baff;
+  color: #9eb3c9;
 }
 
 .probability-block {
@@ -1392,11 +1379,6 @@ textarea:focus,
     height: auto;
     min-height: 56px;
     padding: 10px 14px;
-  }
-
-  .header-divider,
-  .header-subtitle {
-    display: none;
   }
 
   .header-actions {
