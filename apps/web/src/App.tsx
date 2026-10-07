@@ -1161,31 +1161,26 @@ function SystemHeader({
   onCopy: () => void;
 }) {
   return (
-    <div className="system-header">
-      <div>
-        <div className="system-kicker">
-          <span>{model.task}</span>
-          <span>{model.data_scope}</span>
-        </div>
+    <header className="system-header">
+      <div className="system-heading">
+        <div className="system-kicker">{model.task}</div>
         <h1>{model.name}</h1>
         <p>{model.description}</p>
+
+        <div className="benchmark-line">
+          <span>
+            <strong>{model.headline_metric}</strong> {model.headline_value}
+          </span>
+          <span>{model.secondary_metric}</span>
+          <span>{model.data_scope}</span>
+        </div>
+
         <div className="system-meta">{model.technology.join(" · ")}</div>
       </div>
 
-      <div className="system-summary">
-        <div>
-          <span>Held-out benchmark</span>
-          <strong>{model.headline_metric} {model.headline_value}</strong>
-        </div>
-        <div>
-          <span>Also reported</span>
-          <strong>{model.secondary_metric}</strong>
-        </div>
-      </div>
-
-      <div className="system-actions">
+      <nav className="system-actions" aria-label="System links">
         <button className="utility-button" onClick={onCopy}>
-          {copied ? "Copied" : "Copy endpoint"}
+          {copied ? "Endpoint copied" : "Copy endpoint"}
         </button>
         <a
           className="utility-button"
@@ -1193,7 +1188,7 @@ function SystemHeader({
           target="_blank"
           rel="noreferrer"
         >
-          Source ↗
+          Source
         </a>
         <a
           className="utility-button"
@@ -1201,10 +1196,10 @@ function SystemHeader({
           target="_blank"
           rel="noreferrer"
         >
-          API docs ↗
+          API
         </a>
-      </div>
-    </div>
+      </nav>
+    </header>
   );
 }
 
@@ -1254,17 +1249,17 @@ function App() {
         </div>
         <div className="header-actions">
           <a href="/docs" target="_blank" rel="noreferrer">
-            API docs ↗
+            API docs
           </a>
           <a href={GITHUB} target="_blank" rel="noreferrer">
-            GitHub ↗
+            GitHub
           </a>
         </div>
       </header>
 
       <div className="workbench">
         <aside className="service-sidebar">
-          <div className="sidebar-label">Systems</div>
+          <div className="sidebar-label">Models</div>
           <nav className="service-list">
             {models.map((model) => (
               <button
@@ -1301,7 +1296,6 @@ function App() {
                 onCopy={() => void copyEndpoint()}
               />
 
-              <div className="console-divider" />
 
               {active === "spam" && <SpamDemo />}
               {active === "typo" && <TypoDemo />}
