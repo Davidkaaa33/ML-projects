@@ -1213,50 +1213,13 @@ function LabOverview({
   return (
     <div className="lab-overview">
       <div className="lab-overview-intro">
-        <p className="section-kicker">End-to-end ML engineering</p>
-        <h3>Five evaluated ML systems presented as one deployable product.</h3>
+        <h3>Five ML systems, one deployable interface.</h3>
         <p>
-          The lab keeps training and evaluation methodology inside each project,
-          then exposes selected inference paths through one FastAPI layer and one
-          React interface.
+          Each system keeps its own evaluation boundary while selected inference
+          paths are exposed through a shared FastAPI service. Choose a system below
+          to inspect inputs, predictions and API responses.
         </p>
       </div>
-
-      <div className="lab-architecture" aria-label="ML Systems Lab architecture">
-        <div>
-          <span>Interface</span>
-          <strong>React / Vite</strong>
-        </div>
-        <span className="architecture-arrow" aria-hidden="true">→</span>
-        <div>
-          <span>Serving layer</span>
-          <strong>Unified FastAPI</strong>
-        </div>
-        <span className="architecture-arrow" aria-hidden="true">→</span>
-        <div className="architecture-models">
-          <span>Systems</span>
-          <strong>RAG · Fraud · Credit · T9 · Spam</strong>
-        </div>
-      </div>
-
-      <dl className="lab-evidence">
-        <div>
-          <dt>Evaluation</dt>
-          <dd>Held-out metrics and committed machine-readable snapshots</dd>
-        </div>
-        <div>
-          <dt>Serving</dt>
-          <dd>Typed REST contracts, Docker and health checks</dd>
-        </div>
-        <div>
-          <dt>Quality</dt>
-          <dd>pytest, Ruff, CI and dependency auditing</dd>
-        </div>
-        <div>
-          <dt>Reproducibility</dt>
-          <dd>Pinned dependencies and RAG metric-drift verification</dd>
-        </div>
-      </dl>
 
       <div className="lab-system-index">
         <div className="lab-system-index-heading">
@@ -1325,11 +1288,10 @@ export function MLSystemsLab() {
   return (
     <section className="portfolio-section lab-section" id="lab">
       <div className="section-heading">
-        <p className="section-kicker">Interactive systems</p>
         <h2>ML Systems Lab</h2>
         <p>
-          Inspect the evaluation, change model inputs, adjust thresholds and view
-          the actual API request/response path.
+          Live interfaces for the models in this repository. Inputs are sent to the
+          same FastAPI service that serves the portfolio.
         </p>
       </div>
 
@@ -1346,7 +1308,7 @@ export function MLSystemsLab() {
             >
               <span className="service-button-copy">
                 <strong>Overview</strong>
-                <small>Architecture & evaluation</small>
+                <small>Systems and metrics</small>
               </span>
             </button>
 
