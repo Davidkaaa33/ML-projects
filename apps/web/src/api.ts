@@ -1,3 +1,12 @@
+export type ApiTrace<T> = {
+  data: T;
+  endpoint: string;
+  method: string;
+  request: unknown;
+  response: T;
+  durationMs: number;
+};
+
 export async function api<T>(
   path: string,
   options?: RequestInit
@@ -22,4 +31,30 @@ export async function api<T>(
   }
 
   return response.json() as Promise<T>;
+}
+
+export async function apiTrace<T>(
+  path: string,
+  options?: RequestInit
+): Promise<ApiTrace<T>> {
+  const started = performance.now();
+  const data = await api<T>(path, options);
+
+  let request: unknown = null;
+  if (typeof options?.body === "string" && options.body.length > 0) {
+    try {
+      request = JSON.parse(options.body);
+    } catch {
+      request = options.body;
+    }
+  }
+
+  return {
+    data,
+    endpoint: path,
+    method: options?.method ?? "GET",
+    request,
+    response: data,
+    durationMs: performance.now() - started
+  };
 }
