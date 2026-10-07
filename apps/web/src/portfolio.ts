@@ -17,12 +17,13 @@ export const profile = {
   surname: "Danielian",
   role: "Machine Learning Engineer / Data Scientist",
   summary:
-    "I build evaluated machine learning systems — from classical ML and retrieval pipelines to APIs, Dockerized inference and production-oriented evaluation.",
+    "I build machine learning systems that are evaluated, testable and deployable — from retrieval and NLP pipelines to APIs and containerized inference.",
   github: "https://github.com/Davidkaaa33",
   linkedin: "", // TODO: add LinkedIn URL.
   resume: "/David_Danielian_CV.html",
   email: "d.danielian@innopolis.university",
-  education: "Innopolis University · BSc in Data Analysis and Artificial Intelligence · 2025–2028 · GPA 4.9/5.0",
+  education:
+    "Innopolis University · BSc in Data Analysis and Artificial Intelligence · 2025–2028 · GPA 4.9/5.0",
   location: "Innopolis, Russia",
   currentStatus: "Second-year BSc student · full-tuition scholarship",
   targetRoles: ["Machine Learning Engineer", "Data Scientist"] as string[]
@@ -36,12 +37,12 @@ export const featuredProjects: FeaturedProject[] = [
   {
     id: "avito",
     title: "Avito Candidate Retrieval",
-    label: "Flagship",
-    description: "Hybrid lexical + semantic candidate retrieval for service search.",
+    description:
+      "Hybrid candidate retrieval for service search, combining lexical and semantic signals under a query-disjoint evaluation setup.",
     problem:
       "Generate a high-recall set of relevant service listings for each search query.",
     approach:
-      "BM25 and BGE-M3 retrieval combined with geographic, microcategory and query-history signals through weighted reciprocal-rank fusion.",
+      "BM25 and BGE-M3 retrieval are combined with geographic, microcategory and query-history signals through weighted reciprocal-rank fusion.",
     metrics: [{ label: "Recall@50", value: "0.8316" }],
     technologies: ["BM25", "BGE-M3", "Retrieval", "Ranking", "NLP"],
     engineering: [
@@ -55,11 +56,11 @@ export const featuredProjects: FeaturedProject[] = [
     id: "systems-lab",
     title: "ML Systems Lab",
     description:
-      "Five independently evaluated ML systems behind a unified FastAPI service with a React interface.",
+      "A single deployable application that exposes five independent ML systems through one FastAPI service and one React interface.",
     problem:
       "Turn separate ML projects into one deployable product without hiding project-specific evaluation boundaries.",
     approach:
-      "A unified inference layer adapts the existing model code while React provides interactive controls, evaluation views and API inspection.",
+      "The service reuses each project’s original inference logic while keeping model-specific evaluation artifacts and API contracts explicit.",
     metrics: [{ label: "Systems", value: "5" }],
     technologies: ["React", "Vite", "FastAPI", "Docker", "pytest", "GitHub Actions"],
     engineering: [
@@ -74,11 +75,11 @@ export const featuredProjects: FeaturedProject[] = [
     id: "knowledge-assistant",
     title: "Knowledge Assistant",
     description:
-      "Local retrieval-augmented generation with citations, evaluation and calibrated abstention.",
+      "Local retrieval-augmented generation with citation-aware answers, retrieval evaluation and abstention on unsupported questions.",
     problem:
       "Answer questions from a local document corpus while surfacing retrieval quality and unsupported-query behavior.",
     approach:
-      "SentenceTransformer embeddings and FAISS retrieval feed an optional local Qwen/Ollama generation path with citation-aware responses.",
+      "SentenceTransformer embeddings and FAISS retrieval feed an optional local Qwen/Ollama generation path with explicit source citations.",
     metrics: [
       { label: "Hit@1", value: "81.82%" },
       { label: "Hit@3", value: "100%" },
