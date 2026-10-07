@@ -23,9 +23,9 @@ export const profile = {
   resume: "/David_Danielian_CV.html",
   email: "d.danielian@innopolis.university",
   education:
-    "Innopolis University · BSc in Data Analysis and Artificial Intelligence · 2025–2028 · GPA 4.9/5.0",
+    "Innopolis University, BSc in Data Analysis and Artificial Intelligence, 2025–2028, GPA 4.9/5.0",
   location: "Innopolis, Russia",
-  currentStatus: "Second-year BSc student · full-tuition scholarship",
+  currentStatus: "Second-year BSc student, full-tuition scholarship",
   targetRoles: ["Machine Learning Engineer", "Data Scientist"] as string[]
 };
 
