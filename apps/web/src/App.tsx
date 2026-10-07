@@ -1163,7 +1163,6 @@ function SystemHeader({
   return (
     <header className="system-header">
       <div className="system-heading">
-        <div className="system-kicker">{model.task}</div>
         <h1>{model.name}</h1>
         <p>{model.description}</p>
 
