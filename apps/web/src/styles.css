@@ -728,7 +728,7 @@ summary:focus-visible {
   min-width: 0;
 }
 
-.system-header h1 {
+.system-header h3 {
   margin: 0;
   font-size: clamp(34px, 4.4vw, 50px);
   line-height: 1;
@@ -2175,7 +2175,7 @@ textarea:focus,
     grid-row: 1 / span 2;
   }
 
-  .system-header h1 {
+  .system-header h3 {
     font-size: 38px;
   }
 
