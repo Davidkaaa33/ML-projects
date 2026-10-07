@@ -55,3 +55,5 @@ def test_rag_evaluation_is_available_without_ollama():
     assert response.status_code == 200
     assert body["retrieval"]["hit_at_3"] == 1.0
     assert body["abstention"]["threshold"] > 0
+    assert len(body["calibration_records"]) == 14
+    assert {"question", "answerable", "top_score"} <= set(body["calibration_records"][0])
