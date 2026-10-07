@@ -83,7 +83,7 @@ function App() {
               </div>
               <div>
                 <dt>Target roles</dt>
-                <dd>{profile.targetRoles.join(" · ")}</dd>
+                <dd>{profile.targetRoles.join(", ")}</dd>
               </div>
             </dl>
           </div>
@@ -92,7 +92,7 @@ function App() {
             {capabilities.map((capability) => (
               <div className="capability-group" key={capability.title}>
                 <h3>{capability.title}</h3>
-                <p>{capability.items.join(" · ")}</p>
+                <p>{capability.items.join(", ")}</p>
               </div>
             ))}
           </div>
@@ -120,7 +120,7 @@ function App() {
                   <p className="project-approach">{project.approach}</p>
 
                   <div className="project-tech">
-                    {project.technologies.join(" · ")}
+                    {project.technologies.join(", ")}
                   </div>
 
                   <div className="project-actions">
@@ -176,7 +176,7 @@ function App() {
               </div>
               <div>
                 <dt>Target roles</dt>
-                <dd>{profile.targetRoles.join(" · ")}</dd>
+                <dd>{profile.targetRoles.join(", ")}</dd>
               </div>
             </dl>
           </div>
@@ -185,7 +185,7 @@ function App() {
             {capabilities.map((capability) => (
               <div className="capability-group" key={capability.title}>
                 <h3>{capability.title}</h3>
-                <p>{capability.items.join(" · ")}</p>
+                <p>{capability.items.join(", ")}</p>
               </div>
             ))}
           </div>
