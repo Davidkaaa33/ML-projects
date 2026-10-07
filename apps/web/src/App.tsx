@@ -10,7 +10,7 @@ function ExternalLinks({ compact = false }: { compact?: boolean }) {
   const links = [
     { label: "GitHub", href: profile.github },
     { label: "LinkedIn", href: profile.linkedin },
-    { label: "Résumé", href: profile.resume }
+    { label: "Resume", href: profile.resume }
   ].filter((link) => link.href);
 
   return (
@@ -201,7 +201,7 @@ function App() {
           )}
           {profile.email && <a href={`mailto:${profile.email}`}>Email</a>}
           {profile.resume && (
-            <a href={profile.resume} target="_blank" rel="noreferrer">Résumé</a>
+            <a href={profile.resume} target="_blank" rel="noreferrer">Resume</a>
           )}
         </div>
       </footer>
