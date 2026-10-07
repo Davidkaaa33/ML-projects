@@ -1163,7 +1163,7 @@ function SystemHeader({
   return (
     <header className="system-header">
       <div className="system-heading">
-        <h1>{model.name}</h1>
+        <h3>{model.name}</h3>
         <p>{model.description}</p>
 
         <div className="benchmark-line">
