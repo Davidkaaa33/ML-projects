@@ -80,7 +80,7 @@ function RunButton({
       disabled={disabled || busy}
       data-busy={busy}
     >
-      <span className="run-icon">{busy ? "···" : "▶"}</span>
+      <span className="run-icon">{busy ? "…" : "Run"}</span>
       <span>{busy ? "Running model…" : children}</span>
     </button>
   );
@@ -124,7 +124,7 @@ function RequestInspector<T>({ trace }: { trace: ApiTrace<T> | null }) {
       <summary>
         <span>Inspect API request</span>
         <span className="inspector-meta">
-          {trace.method} · {Math.round(trace.durationMs)} ms
+          {trace.method}, {Math.round(trace.durationMs)} ms
         </span>
       </summary>
       <div className="inspector-content">
@@ -286,7 +286,7 @@ function SpamDemo() {
       <section className="result-pane">
         <div className="panel-heading">
           <span>Model output</span>
-          <span className="mono-label">TF-IDF · Multinomial NB</span>
+          <span className="mono-label">TF-IDF, Multinomial NB</span>
         </div>
 
         {result ? (
@@ -334,7 +334,7 @@ function SpamDemo() {
               </div>
               <div>
                 <span>Benchmark</span>
-                <strong>Precision 1.0000 · F1 0.7642</strong>
+                <strong>Precision 1.0000, F1 0.7642</strong>
               </div>
             </div>
             <RequestInspector trace={trace} />
@@ -477,7 +477,7 @@ function TypoDemo() {
       <section className="result-pane">
         <div className="panel-heading">
           <span>Ranked candidates</span>
-          <span className="mono-label">Levenshtein · deterministic scoring</span>
+          <span className="mono-label">Levenshtein, deterministic scoring</span>
         </div>
 
         {result ? (
@@ -726,7 +726,7 @@ function RecordDemo({ kind }: { kind: "fraud" | "credit" }) {
       <section className="result-pane">
         <div className="panel-heading">
           <span>{kind === "fraud" ? "Transaction risk" : "Repayment score"}</span>
-          <span className="mono-label">Random Forest · sklearn Pipeline</span>
+          <span className="mono-label">Random Forest, sklearn Pipeline</span>
         </div>
 
         {result && probability !== null ? (
@@ -1174,7 +1174,7 @@ function SystemHeader({
           <span>{model.data_scope}</span>
         </div>
 
-        <div className="system-meta">{model.technology.join(" · ")}</div>
+        <div className="system-meta">{model.technology.join(", ")}</div>
       </div>
 
       <nav className="system-actions" aria-label="System links">
