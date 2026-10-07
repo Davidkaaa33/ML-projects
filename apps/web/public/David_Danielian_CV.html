@@ -7,94 +7,178 @@
     <title>David Danielian — Resume</title>
     <style>
       :root {
-        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        color: #14171b;
-        background: #eef1f4;
+        font-family: Arial, Helvetica, sans-serif;
+        color: #111111;
+        background: #ececec;
       }
-      * { box-sizing: border-box; }
-      body { margin: 0; }
-      a { color: inherit; }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+      }
+
+      a {
+        color: #0645ad;
+        text-decoration: underline;
+        text-underline-offset: 1px;
+      }
+
       .toolbar {
-        width: min(100% - 32px, 900px);
-        margin: 20px auto 12px;
+        width: min(calc(100% - 28px), 210mm);
+        margin: 14px auto 8px;
         display: flex;
+        align-items: center;
         justify-content: space-between;
         gap: 16px;
-        color: #59616b;
-        font-size: 13px;
+        color: #555;
+        font-size: 12px;
       }
+
+      .toolbar a {
+        color: #333;
+        text-decoration: none;
+      }
+
       .toolbar button {
+        padding: 0;
         border: 0;
         background: transparent;
-        color: #14171b;
+        color: #333;
         font: inherit;
         cursor: pointer;
       }
+
+      .toolbar a:hover,
+      .toolbar button:hover {
+        color: #000;
+        text-decoration: underline;
+      }
+
       .page {
-        width: min(100% - 32px, 900px);
-        margin: 0 auto 40px;
-        padding: 50px 56px 54px;
+        width: min(calc(100% - 28px), 210mm);
+        min-height: 297mm;
+        margin: 0 auto 26px;
+        padding: 11mm 12mm 10mm;
         background: #fff;
-        box-shadow: 0 10px 40px rgba(0,0,0,.08);
+        box-shadow: 0 3px 18px rgba(0, 0, 0, 0.12);
       }
+
+      header {
+        margin-bottom: 3px;
+      }
+
       h1 {
-        margin: 0;
-        font-size: 34px;
+        margin: 0 0 1px;
+        font-size: 27px;
         line-height: 1;
-        letter-spacing: -.04em;
+        font-weight: 800;
+        letter-spacing: -0.035em;
       }
+
       .contacts {
-        margin-top: 12px;
-        color: #454c55;
-        font-size: 13px;
-        line-height: 1.55;
+        font-size: 11.4px;
+        line-height: 1.12;
       }
-      .contacts a { text-decoration-thickness: 1px; text-underline-offset: 2px; }
-      section { margin-top: 25px; }
+
+      section {
+        margin-top: 4px;
+      }
+
       h2 {
-        margin: 0 0 9px;
-        padding-bottom: 6px;
-        border-bottom: 1px solid #d9dee4;
-        font-size: 15px;
-        letter-spacing: .02em;
+        margin: 0 0 1px;
+        color: #e01b24;
+        font-size: 17px;
+        line-height: 1.02;
+        font-weight: 800;
       }
+
       h3 {
-        margin: 13px 0 4px;
-        font-size: 13.5px;
+        margin: 2px 0 0;
+        font-size: 11.8px;
+        line-height: 1.12;
+        font-weight: 800;
       }
+
       p {
-        margin: 3px 0;
-        font-size: 12.4px;
-        line-height: 1.48;
+        margin: 0;
+        font-size: 11.15px;
+        line-height: 1.14;
       }
-      .muted { color: #606973; }
-      .skills p strong { display: inline-block; min-width: 126px; }
+
+      .muted {
+        color: #222;
+      }
+
+      .skills p strong {
+        font-weight: 800;
+      }
+
       ul {
-        margin: 6px 0 0;
-        padding-left: 18px;
+        margin: 1px 0 0;
+        padding-left: 16px;
       }
+
       li {
-        margin: 4px 0;
-        font-size: 12.2px;
-        line-height: 1.45;
+        margin: 0;
+        font-size: 10.9px;
+        line-height: 1.12;
       }
-      @media (max-width: 680px) {
-        .page { padding: 30px 22px 36px; }
-        .skills p strong { display: block; min-width: 0; }
-      }
-      @media print {
-        :root { background: #fff; }
-        .toolbar { display: none; }
+
+      @media (max-width: 700px) {
         .page {
-          width: auto;
+          width: 100%;
+          min-height: 0;
           margin: 0;
-          padding: 14mm 15mm;
+          padding: 24px 18px 30px;
           box-shadow: none;
         }
-        a { text-decoration: none; }
+
+        .toolbar {
+          width: calc(100% - 28px);
+        }
+
+        h1 {
+          font-size: 25px;
+        }
+
+        h2 {
+          margin-top: 6px;
+        }
+      }
+
+      @media print {
+        @page {
+          size: A4;
+          margin: 0;
+        }
+
+        :root,
+        body {
+          background: #fff;
+        }
+
+        .toolbar {
+          display: none;
+        }
+
+        .page {
+          width: 210mm;
+          min-height: 297mm;
+          margin: 0;
+          padding: 10mm 12mm 9mm;
+          box-shadow: none;
+        }
+
+        a {
+          color: #0645ad;
+        }
       }
     </style>
   </head>
+
   <body>
     <div class="toolbar">
       <a href="/">← Portfolio</a>
@@ -105,9 +189,12 @@
       <header>
         <h1>Давид Даниелян</h1>
         <div class="contacts">
-          Иннополис, Россия · +7 (950) 462-82-62<br />
-          <a href="mailto:d.danielian@innopolis.university">d.danielian@innopolis.university</a>
-          · Telegram: @Dava_Djan ·
+          Иннополис, Россия<br />
+          +7 (950) 462-82-62<br />
+          Email:
+          <a href="mailto:d.danielian@innopolis.university">d.danielian@innopolis.university</a><br />
+          Telegram: @Dava_Djan<br />
+          GitHub:
           <a href="https://github.com/Davidkaaa33">github.com/Davidkaaa33</a>
         </div>
       </header>
@@ -151,19 +238,26 @@
         <p>
           Разработал гибридный pipeline генерации кандидатов для поиска услуг:
           BGE-M3 + BM25, geo/microcat retrieval, history-based retrieval и weighted RRF.
+        </p>
+        <p>
           Проводил query-disjoint validation, отдельный tuning/check split и error analysis;
           итоговый Recall@50 — 0.831562.
         </p>
-        <p><a href="https://github.com/Davidkaaa33/avito-ds-bootcamp-2026-solution">GitHub repository</a></p>
+        <p>
+          GitHub:
+          <a href="https://github.com/Davidkaaa33/avito-ds-bootcamp-2026-solution">github.com/Davidkaaa33/avito-ds-bootcamp-2026-solution</a>
+        </p>
 
         <h3>PostCode Challenge 2026 (Почтатех) — Мониторинг и категоризация обращений — 11-е место</h3>
         <p>
           В составе команды разработал end-to-end ML-систему для категоризации и
           маршрутизации обращений Service Desk: дообученный MiniLM,
-          TF-IDF/metadata-признаки, LinearSVC, semantic retrieval и confidence-based
-          review. Реализовали поиск похожих обращений, анализ SLA и переходов между
-          статусами, TOP-3 предсказания и перепроверку сложных случаев через
-          Qwen3-Embedding-4B + LoRA; сервис интегрирован с FastAPI и React.
+          TF-IDF/metadata-признаки, LinearSVC, semantic retrieval и confidence-based review.
+        </p>
+        <p>
+          Реализовали поиск похожих обращений, анализ SLA и переходов между статусами,
+          TOP-3 предсказания и перепроверку сложных случаев через Qwen3-Embedding-4B + LoRA;
+          сервис интегрирован с FastAPI и React.
         </p>
 
         <h3>Store Order Management System — Team Lead</h3>
@@ -176,9 +270,11 @@
         <h3>Bank Transaction Fraud Detection — ML-пет-проект</h3>
         <p>
           Построил end-to-end ML pipeline для выявления мошеннических транзакций:
-          feature engineering, Logistic Regression/Random Forest, работа с дисбалансом
-          классов и tuning порога на validation. Итог на test: ROC-AUC 0.8713,
-          PR-AUC 0.3399, F1 0.3722; threshold 0.15 выбран на validation.
+          feature engineering, Logistic Regression/Random Forest, работа с дисбалансом классов
+          и tuning порога на validation.
+        </p>
+        <p>
+          Итог на test: ROC-AUC 0.8713, PR-AUC 0.3399, F1 0.3722; threshold 0.15 выбран на validation.
         </p>
 
         <h3>T9 Typo Correction — NLP-пет-проект</h3>
@@ -186,7 +282,10 @@
           Разработал NLP-пайплайн: candidate generation → edit-distance ranking →
           классификация типа опечатки; Top-1 accuracy 97.75%, Top-3 recall 99.82%.
         </p>
-        <p><a href="https://github.com/Davidkaaa33/ML-projects">GitHub repository</a></p>
+        <p>
+          GitHub:
+          <a href="https://github.com/Davidkaaa33/ML-projects">github.com/Davidkaaa33/ML-projects</a>
+        </p>
       </section>
 
       <section>
