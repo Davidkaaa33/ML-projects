@@ -1251,8 +1251,6 @@ function App() {
       <header className="app-header">
         <div className="app-identity">
           <span className="wordmark">ML Systems Lab</span>
-          <span className="header-divider" />
-          <span className="header-subtitle">interactive inference & evaluation</span>
         </div>
         <div className="header-actions">
           <a href="/docs" target="_blank" rel="noreferrer">
