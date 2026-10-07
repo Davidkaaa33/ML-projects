@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="index,follow" />
+    <title>David Danielian — Resume</title>
+    <style>
+      :root {
+        font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: #14171b;
+        background: #eef1f4;
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; }
+      a { color: inherit; }
+      .toolbar {
+        width: min(100% - 32px, 900px);
+        margin: 20px auto 12px;
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        color: #59616b;
+        font-size: 13px;
+      }
+      .toolbar button {
+        border: 0;
+        background: transparent;
+        color: #14171b;
+        font: inherit;
+        cursor: pointer;
+      }
+      .page {
+        width: min(100% - 32px, 900px);
+        margin: 0 auto 40px;
+        padding: 50px 56px 54px;
+        background: #fff;
+        box-shadow: 0 10px 40px rgba(0,0,0,.08);
+      }
+      h1 {
+        margin: 0;
+        font-size: 34px;
+        line-height: 1;
+        letter-spacing: -.04em;
+      }
+      .contacts {
+        margin-top: 12px;
+        color: #454c55;
+        font-size: 13px;
+        line-height: 1.55;
+      }
+      .contacts a { text-decoration-thickness: 1px; text-underline-offset: 2px; }
+      section { margin-top: 25px; }
+      h2 {
+        margin: 0 0 9px;
+        padding-bottom: 6px;
+        border-bottom: 1px solid #d9dee4;
+        font-size: 15px;
+        letter-spacing: .02em;
+      }
+      h3 {
+        margin: 13px 0 4px;
+        font-size: 13.5px;
+      }
+      p {
+        margin: 3px 0;
+        font-size: 12.4px;
+        line-height: 1.48;
+      }
+      .muted { color: #606973; }
+      .skills p strong { display: inline-block; min-width: 126px; }
+      ul {
+        margin: 6px 0 0;
+        padding-left: 18px;
+      }
+      li {
+        margin: 4px 0;
+        font-size: 12.2px;
+        line-height: 1.45;
+      }
+      @media (max-width: 680px) {
+        .page { padding: 30px 22px 36px; }
+        .skills p strong { display: block; min-width: 0; }
+      }
+      @media print {
+        :root { background: #fff; }
+        .toolbar { display: none; }
+        .page {
+          width: auto;
+          margin: 0;
+          padding: 14mm 15mm;
+          box-shadow: none;
+        }
+        a { text-decoration: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="toolbar">
+      <a href="/">← Portfolio</a>
+      <button type="button" onclick="window.print()">Print / Save PDF</button>
+    </div>
+
+    <main class="page">
+      <header>
+        <h1>Давид Даниелян</h1>
+        <div class="contacts">
+          Иннополис, Россия · +7 (950) 462-82-62<br />
+          <a href="mailto:d.danielian@innopolis.university">d.danielian@innopolis.university</a>
+          · Telegram: @Dava_Djan ·
+          <a href="https://github.com/Davidkaaa33">github.com/Davidkaaa33</a>
+        </div>
+      </header>
+
+      <section>
+        <h2>Профиль</h2>
+        <p>
+          Студент второго курса направления «Анализ данных и искусственный интеллект»
+          Университета Иннополис, GPA 4.9/5.0. Основные интересы: ML Engineering,
+          NLP и информационный поиск. Есть практический опыт разработки ML-пайплайнов
+          на Python, командной работы над прикладными ML-системами и участия в хакатонах.
+        </p>
+      </section>
+
+      <section>
+        <h2>Образование</h2>
+        <h3>Университет Иннополис, бакалавриат, 2025–2028</h3>
+        <p>
+          Направление: Анализ данных и искусственный интеллект. GPA: 4.9/5.0.
+          Грант на полное обучение; программа полностью на английском языке.
+        </p>
+        <p class="muted">
+          Ключевые дисциплины: линейная алгебра, математический анализ, дискретная
+          математика, алгоритмы и структуры данных, введение в ИИ, теория вероятности
+          и статистика, введение в оптимизацию.
+        </p>
+      </section>
+
+      <section class="skills">
+        <h2>Ключевые навыки</h2>
+        <p><strong>Programming:</strong> Python, SQL, C++; алгоритмы и структуры данных</p>
+        <p><strong>Data & ML:</strong> NumPy, pandas, scikit-learn, CatBoost; EDA, preprocessing, feature engineering, классификация, boosting, cross-validation, imbalanced learning, threshold tuning, error analysis</p>
+        <p><strong>DL/NLP & Retrieval:</strong> PyTorch, Transformers, Sentence Transformers, BGE-M3, BM25, MiniLM; text classification, embeddings, semantic search, candidate generation/ranking, RRF</p>
+        <p><strong>Engineering:</strong> Git, GitHub/GitLab, PostgreSQL, FastAPI, Docker, CI/CD</p>
+      </section>
+
+      <section>
+        <h2>Проекты</h2>
+
+        <h3>Avito Data Science Bootcamp 2026 — Генерация кандидатов</h3>
+        <p>
+          Разработал гибридный pipeline генерации кандидатов для поиска услуг:
+          BGE-M3 + BM25, geo/microcat retrieval, history-based retrieval и weighted RRF.
+          Проводил query-disjoint validation, отдельный tuning/check split и error analysis;
+          итоговый Recall@50 — 0.831562.
+        </p>
+        <p><a href="https://github.com/Davidkaaa33/avito-ds-bootcamp-2026-solution">GitHub repository</a></p>
+
+        <h3>PostCode Challenge 2026 (Почтатех) — Мониторинг и категоризация обращений — 11-е место</h3>
+        <p>
+          В составе команды разработал end-to-end ML-систему для категоризации и
+          маршрутизации обращений Service Desk: дообученный MiniLM,
+          TF-IDF/metadata-признаки, LinearSVC, semantic retrieval и confidence-based
+          review. Реализовали поиск похожих обращений, анализ SLA и переходов между
+          статусами, TOP-3 предсказания и перепроверку сложных случаев через
+          Qwen3-Embedding-4B + LoRA; сервис интегрирован с FastAPI и React.
+        </p>
+
+        <h3>Store Order Management System — Team Lead</h3>
+        <p>
+          Руководил университетским командным проектом системы управления заказами:
+          sprint/backlog, распределение задач, code review, CI и customer feedback;
+          участвовал в backend/frontend/API и документации качества, команда выпустила MVP v3.
+        </p>
+
+        <h3>Bank Transaction Fraud Detection — ML-пет-проект</h3>
+        <p>
+          Построил end-to-end ML pipeline для выявления мошеннических транзакций:
+          feature engineering, Logistic Regression/Random Forest, работа с дисбалансом
+          классов и tuning порога на validation. Итог на test: ROC-AUC 0.8713,
+          PR-AUC 0.3399, F1 0.3722; threshold 0.15 выбран на validation.
+        </p>
+
+        <h3>T9 Typo Correction — NLP-пет-проект</h3>
+        <p>
+          Разработал NLP-пайплайн: candidate generation → edit-distance ranking →
+          классификация типа опечатки; Top-1 accuracy 97.75%, Top-3 recall 99.82%.
+        </p>
+        <p><a href="https://github.com/Davidkaaa33/ML-projects">GitHub repository</a></p>
+      </section>
+
+      <section>
+        <h2>Дополнительное образование</h2>
+        <ul>
+          <li><strong>DeepLearning.AI:</strong> Machine Learning Specialization; Mathematics for Machine Learning and Data Science; Machine Learning in Production</li>
+          <li><strong>Caltech / ods.ai:</strong> Machine Learning; ML System Design Course</li>
+          <li><strong>DataCamp:</strong> Machine Learning Scientist, Machine Learning Engineer tracks; Intro/Intermediate DL with PyTorch; Transformer Models with PyTorch</li>
+          <li><strong>Kaggle:</strong> Pandas; Intro to SQL; Advanced SQL; Intro to Machine Learning</li>
+          <li><strong>Stepik / Яндекс / VK Education / CampusX:</strong> Введение в Data Science и машинное обучение; хэндбук по Machine Learning; Системы обработки и анализа больших массивов данных; 100 Days of Machine Learning</li>
+        </ul>
+      </section>
+    </main>
+  </body>
+</html>
