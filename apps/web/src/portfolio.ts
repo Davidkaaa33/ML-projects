@@ -20,7 +20,7 @@ export const profile = {
     "I build evaluated machine learning systems — from classical ML and retrieval pipelines to APIs, Dockerized inference and production-oriented evaluation.",
   github: "https://github.com/Davidkaaa33",
   linkedin: "", // TODO: add LinkedIn URL.
-  resume: "/David_Danielian_CV.pdf",
+  resume: "/David_Danielian_CV.html",
   email: "d.danielian@innopolis.university",
   education: "Innopolis University · BSc in Data Analysis and Artificial Intelligence · 2025–2028 · GPA 4.9/5.0",
   location: "Innopolis, Russia",
