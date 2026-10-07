@@ -1,5 +1,7 @@
 import { MLSystemsLab } from "./Lab";
 import {
+  additionalLearning,
+  additionalPractice,
   capabilities,
   featuredProjects,
   profile,
@@ -9,7 +11,6 @@ import {
 function ExternalLinks({ compact = false }: { compact?: boolean }) {
   const links = [
     { label: "GitHub", href: profile.github },
-    { label: "LinkedIn", href: profile.linkedin },
     { label: "Resume", href: profile.resume }
   ].filter((link) => link.href);
 
@@ -35,6 +36,7 @@ function App() {
         <nav className="portfolio-nav" aria-label="Portfolio navigation">
           <a href="#about">About</a>
           <a href="#work">Work</a>
+          <a href="#skills">Skills</a>
           <a href="#lab">Lab</a>
         </nav>
 
@@ -67,9 +69,10 @@ function App() {
           <div className="about-layout">
             <p className="about-copy">
               Second-year BSc student in Data Analysis and Artificial Intelligence at
-              Innopolis University. I focus on ML engineering, NLP and information
-              retrieval, with an emphasis on evaluation, reproducibility and deployable
-              systems rather than notebook-only experiments.
+              Innopolis University. GPA 4.9/5.0, full-tuition scholarship, with the
+              programme taught entirely in English. Project work includes hybrid
+              retrieval, Service Desk categorization and routing, and deploying multiple
+              ML systems through FastAPI, React, Docker and CI.
             </p>
 
             <dl className="about-facts">
@@ -78,23 +81,20 @@ function App() {
                 <dd>{profile.education}</dd>
               </div>
               <div>
-                <dt>Current status</dt>
+                <dt>Status</dt>
                 <dd>{profile.currentStatus}</dd>
               </div>
               <div>
-                <dt>Target roles</dt>
-                <dd>{profile.targetRoles.join(", ")}</dd>
+                <dt>Contact</dt>
+                <dd>
+                  <a href={`mailto:${profile.email}`}>{profile.email}</a>
+                  <br />
+                  <a href={profile.telegram} target="_blank" rel="noreferrer">
+                    Telegram
+                  </a>
+                </dd>
               </div>
             </dl>
-          </div>
-
-          <div className="capability-grid">
-            {capabilities.map((capability) => (
-              <div className="capability-group" key={capability.title}>
-                <h3>{capability.title}</h3>
-                <p>{capability.items.join(", ")}</p>
-              </div>
-            ))}
           </div>
         </section>
 
@@ -102,8 +102,8 @@ function App() {
           <div className="section-heading">
             <h2>Selected work</h2>
             <p>
-              A small set of projects focused on retrieval, applied machine learning
-              and production-oriented evaluation.
+              Competition work, applied ML systems and a university team project,
+              presented with the same results reported in the current resume.
             </p>
           </div>
 
@@ -116,25 +116,22 @@ function App() {
                   </div>
 
                   <p className="project-description">{project.description}</p>
-
                   <p className="project-approach">{project.approach}</p>
 
                   <div className="project-tech">
                     {project.technologies.join(", ")}
                   </div>
 
-                  <div className="project-actions">
-                    {project.liveUrl && (
-                      <a href={project.liveUrl}>
-                        {project.id === "systems-lab" ? "Open lab" : "Open demo"}
-                      </a>
-                    )}
-                    {project.sourceUrl && (
-                      <a href={project.sourceUrl} target="_blank" rel="noreferrer">
-                        Source
-                      </a>
-                    )}
-                  </div>
+                  {(project.liveUrl || project.sourceUrl) && (
+                    <div className="project-actions">
+                      {project.liveUrl && <a href={project.liveUrl}>Open lab</a>}
+                      {project.sourceUrl && (
+                        <a href={project.sourceUrl} target="_blank" rel="noreferrer">
+                          Source
+                        </a>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 <dl className="project-results" aria-label={`${project.title} results`}>
@@ -150,35 +147,9 @@ function App() {
           </div>
         </section>
 
-        <MLSystemsLab />
-
-        <section className="portfolio-section about-section" id="about">
+        <section className="portfolio-section skills-section" id="skills">
           <div className="section-heading">
-            <h2>About</h2>
-          </div>
-
-          <div className="about-layout">
-            <p className="about-copy">
-              Second-year BSc student in Data Analysis and Artificial Intelligence at
-              Innopolis University. I focus on ML engineering, NLP and information
-              retrieval, with an emphasis on evaluation, reproducibility and deployable
-              systems rather than notebook-only experiments.
-            </p>
-
-            <dl className="about-facts">
-              <div>
-                <dt>Education</dt>
-                <dd>{profile.education}</dd>
-              </div>
-              <div>
-                <dt>Current status</dt>
-                <dd>{profile.currentStatus}</dd>
-              </div>
-              <div>
-                <dt>Target roles</dt>
-                <dd>{profile.targetRoles.join(", ")}</dd>
-              </div>
-            </dl>
+            <h2>Skills</h2>
           </div>
 
           <div className="capability-grid">
@@ -189,20 +160,29 @@ function App() {
               </div>
             ))}
           </div>
+
+          <div className="learning-layout">
+            <div>
+              <h3>Additional education</h3>
+              {additionalLearning.map((item) => <p key={item}>{item}</p>)}
+            </div>
+            <div>
+              <h3>Additional practice</h3>
+              {additionalPractice.map((item) => <p key={item}>{item}</p>)}
+            </div>
+          </div>
         </section>
+
+        <MLSystemsLab />
       </main>
 
       <footer className="portfolio-footer">
         <span>{profileName}</span>
         <div>
           <a href={profile.github} target="_blank" rel="noreferrer">GitHub</a>
-          {profile.linkedin && (
-            <a href={profile.linkedin} target="_blank" rel="noreferrer">LinkedIn</a>
-          )}
-          {profile.email && <a href={`mailto:${profile.email}`}>Email</a>}
-          {profile.resume && (
-            <a href={profile.resume} target="_blank" rel="noreferrer">Resume</a>
-          )}
+          <a href={profile.telegram} target="_blank" rel="noreferrer">Telegram</a>
+          <a href={`mailto:${profile.email}`}>Email</a>
+          <a href={profile.resume} target="_blank" rel="noreferrer">Resume</a>
         </div>
       </footer>
     </div>

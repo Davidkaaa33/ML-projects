@@ -3086,3 +3086,62 @@ select:focus {
     gap: 14px;
   }
 }
+
+/* CV_SYNC_LAYOUT */
+
+.skills-section .capability-grid {
+  margin-top: 0;
+}
+
+.capability-group:nth-child(5) {
+  grid-column: 1 / -1;
+  border-right: 0;
+}
+
+.learning-layout {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 56px;
+  margin-top: 52px;
+  padding-top: 28px;
+  border-top: 1px solid var(--line);
+}
+
+.learning-layout h3 {
+  margin: 0 0 14px;
+  font-size: 13px;
+  font-weight: 620;
+}
+
+.learning-layout p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.learning-layout p + p {
+  margin-top: 10px;
+}
+
+.about-facts a {
+  text-decoration: underline;
+  text-decoration-color: #c4c3bc;
+  text-underline-offset: 3px;
+}
+
+.about-facts a:hover {
+  text-decoration-color: var(--text);
+}
+
+@media (max-width: 640px) {
+  .capability-group:nth-child(5) {
+    grid-column: auto;
+  }
+
+  .learning-layout {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    margin-top: 40px;
+  }
+}
