@@ -1,0 +1,42 @@
+name: Publish current resume PDF
+
+on:
+  push:
+    branches: [publish-current-resume-pdf]
+    paths:
+      - apps/web/resume-source.html
+      - .github/workflows/publish-resume-pdf.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  render-resume:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install PDF renderer
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libpango-1.0-0 libpangoft2-1.0-0 fonts-liberation poppler-utils
+          python -m pip install "weasyprint==68.0"
+      - name: Render resume
+        run: |
+          weasyprint apps/web/resume-source.html apps/web/public/David_Danielian_CV.pdf
+          pdfinfo apps/web/public/David_Danielian_CV.pdf | grep -qE '^Pages:[[:space:]]+1$'
+          test -s apps/web/public/David_Danielian_CV.pdf
+      - name: Commit PDF to branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/web/public/David_Danielian_CV.pdf
+          if ! git diff --cached --quiet; then
+            git commit -m "Generate current resume PDF"
+            git push origin HEAD:publish-current-resume-pdf
+          fi

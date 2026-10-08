@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>David Danielian CV</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 14mm 16mm 15mm 16mm;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      color: #242424;
+      font-family: "Liberation Sans", Arial, sans-serif;
+      font-size: 9pt;
+      line-height: 1.38;
+    }
+    h1 {
+      font-size: 21pt;
+      letter-spacing: -0.45px;
+      line-height: 1.13;
+      margin: 0 0 2px 0;
+      color: #222;
+      font-weight: 700;
+    }
+    h2 {
+      font-size: 10.7pt;
+      margin: 11px 0 5px;
+      color: #932f36;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+    h3 {
+      font-size: 9.2pt;
+      line-height: 1.26;
+      margin: 5px 0 0;
+      font-weight: 700;
+    }
+    p { margin: 0; }
+    .contacts { color: #626262; line-height: 1.3; }
+    .contacts a { color: #932f36; }
+    a { color: #932f36; text-decoration: none; }
+    .metric { font-weight: 700; color: #932f36; }
+    .emphasis { font-weight: 700; }
+    .project { break-inside: avoid; }
+    .project + .project { margin-top: 6px; }
+    .skills strong, .courses strong { font-weight: 700; }
+    .skills, .courses, .practice { line-height: 1.36; }
+    section { break-inside: avoid; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Давид Даниелян</h1>
+    <div class="contacts">
+      Иннополис, Россия<br>
+      +7 (950) 462-82-62<br>
+      <a href="mailto:d.danielian@innopolis.university">d.danielian@innopolis.university</a><br>
+      Telegram: <a href="https://t.me/Dava_Djan">@Dava_Djan</a><br>
+      GitHub: <a href="https://github.com/Davidkaaa33">github.com/Davidkaaa33</a>
+    </div>
+  </header>
+
+  <section>
+    <h2>Образование</h2>
+    <p><strong>Университет Иннополис</strong></p>
+    <p>2025–2028, бакалавриат, Анализ данных и искусственный интеллект</p>
+    <p><strong class="metric">GPA 4.9/5.0</strong>; грант на полное обучение; программа полностью на английском языке.</p>
+    <p>Ключевые дисциплины: линейная алгебра, математический анализ, вероятность и статистика, алгоритмы и структуры данных, оптимизация, введение в ИИ.</p>
+  </section>
+
+  <section>
+    <h2>Проекты</h2>
+    <div class="project">
+      <h3>Avito Data Science Bootcamp 2026</h3>
+      <p class="metric">Recall@50 0.831562</p>
+      <p>Разработал гибридный retrieval pipeline для поиска услуг: BGE-M3, BM25, география, микрокатегории, история запросов и weighted RRF.</p>
+      <p><span class="emphasis">Query-disjoint validation</span> с отдельными tuning и confirmation срезами; итоговый результат подтверждён на платформе.</p>
+      <p><a href="https://github.com/Davidkaaa33/avito-ds-bootcamp-2026-solution"><strong>GitHub</strong></a></p>
+    </div>
+    <div class="project">
+      <h3>PostCode Challenge 2026 (Почтатех)</h3>
+      <p class="metric">11-е место</p>
+      <p>В составе команды разработал ML-систему категоризации и маршрутизации Service Desk: MiniLM, TF-IDF и metadata-признаки, LinearSVC, semantic retrieval и confidence-based review.</p>
+      <p>Система включала поиск похожих обращений, SLA-анализ, Top-3 предсказания, перепроверку сложных случаев через Qwen3-Embedding-4B + LoRA и сервис на FastAPI + React.</p>
+    </div>
+    <div class="project">
+      <h3>ML Systems Lab</h3>
+      <p>Объединил пять систем в единый ML-портфель: Fraud Detection, Credit Repayment, SMS Spam, T9 Correction и локальный RAG; serving через FastAPI, React, Docker и CI.</p>
+      <p>Ключевые результаты:</p>
+      <p>Fraud Detection: <strong class="metric">ROC-AUC 0.8713</strong></p>
+      <p>T9 Correction: <strong class="metric">Top-1 accuracy 97.75%</strong></p>
+      <p>RAG: <strong class="metric">Hit@1 81.82%</strong></p>
+      <p><a href="https://github.com/Davidkaaa33/ML-projects"><strong>GitHub</strong></a></p>
+      <p><a href="https://ml-systems-lab-davidkaaa33.up.railway.app"><strong>Live Demo</strong></a></p>
+    </div>
+    <div class="project">
+      <h3>Store Order Management System</h3>
+      <p class="metric">Team Lead</p>
+      <p>Руководил университетской командой: backlog и sprint planning, распределение задач, code review, CI и customer feedback; участвовал в backend, frontend, API и документации качества. Команда выпустила MVP v3.</p>
+    </div>
+  </section>
+
+  <section class="skills">
+    <h2>Ключевые навыки</h2>
+    <p><strong>Programming:</strong> Python, SQL, C++</p>
+    <p><strong>ML / Data:</strong> NumPy, pandas, scikit-learn, CatBoost, PyTorch</p>
+    <p><strong>NLP / Retrieval:</strong> Transformers, SentenceTransformers, BGE-M3, BM25, MiniLM, RRF</p>
+    <p><strong>Engineering:</strong> FastAPI, Docker, PostgreSQL, Git, GitHub Actions</p>
+    <p><strong>Methods:</strong> cross-validation, feature engineering, imbalanced learning, threshold tuning, error analysis</p>
+  </section>
+
+  <section class="courses">
+    <h2>Дополнительное образование</h2>
+    <p><strong>DeepLearning.AI:</strong> Machine Learning Specialization; Mathematics for Machine Learning and Data Science; Machine Learning in Production</p>
+    <p><strong>Caltech / ods.ai:</strong> Machine Learning; ML System Design Course</p>
+  </section>
+
+  <section class="practice">
+    <h2>Дополнительная практика</h2>
+    <p><strong>LeetCode:</strong> самостоятельное решение, разбор альтернатив, оптимизация, анализ time/space complexity.</p>
+    <p><strong>Deep-ML:</strong> практика ML fundamentals с разбором алгоритмов, вычислительной сложности и trade-offs.</p>
+  </section>
+</body>
+</html>
