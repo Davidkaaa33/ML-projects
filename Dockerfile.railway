@@ -4,7 +4,19 @@ WORKDIR /web
 COPY apps/web/package.json ./
 RUN npm install --no-audit --no-fund
 COPY apps/web ./
-RUN npm run build
+RUN cat \
+      cv-pdf/pdf01.b64 \
+      cv-pdf/p08000.b64 \
+      cv-pdf/p24000.b64 \
+      cv-pdf/p32000.b64 \
+      cv-pdf/p40000.b64 \
+      cv-pdf/p48000.b64 \
+      cv-pdf/p56000.b64 \
+      cv-pdf/p64000.b64 \
+      cv-pdf/p72000.b64 \
+    | base64 -d > public/David_Danielian_CV.pdf \
+    && echo "9f8ec1e5114d8cb772b04f6c82793606e70c3c16a4c6e51271c3bde06b4f8dc4  public/David_Danielian_CV.pdf" | sha256sum -c - \
+    && npm run build
 
 FROM python:3.12-slim
 
