@@ -10,8 +10,7 @@ import {
 
 function ExternalLinks({ compact = false }: { compact?: boolean }) {
   const links = [
-    { label: "GitHub", href: profile.github },
-    { label: "Resume", href: profile.resume }
+    { label: "GitHub", href: profile.github }
   ].filter((link) => link.href);
 
   return (
@@ -103,7 +102,7 @@ function App() {
             <h2>Selected work</h2>
             <p>
               Competition work, applied ML systems and a university team project,
-              presented with the same results reported in the current resume.
+              with measured results and links to their implementation.
             </p>
           </div>
 
@@ -182,7 +181,6 @@ function App() {
           <a href={profile.github} target="_blank" rel="noreferrer">GitHub</a>
           <a href={profile.telegram} target="_blank" rel="noreferrer">Telegram</a>
           <a href={`mailto:${profile.email}`}>Email</a>
-          <a href={profile.resume} target="_blank" rel="noreferrer">Resume</a>
         </div>
       </footer>
     </div>

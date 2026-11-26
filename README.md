@@ -3,8 +3,6 @@
 [![Portfolio CI](https://github.com/Davidkaaa33/ML-projects/actions/workflows/ci.yml/badge.svg)](https://github.com/Davidkaaa33/ML-projects/actions/workflows/ci.yml)
 [![RAG Retrieval Evaluation](https://github.com/Davidkaaa33/ML-projects/actions/workflows/rag-evaluation.yml/badge.svg)](https://github.com/Davidkaaa33/ML-projects/actions/workflows/rag-evaluation.yml)
 
-**[Live Demo →](https://ml-systems-lab-davidkaaa33.up.railway.app)**
-
 ## ML Systems Lab
 
 Five independently evaluated ML systems packaged behind one FastAPI + React product.
@@ -51,7 +49,7 @@ Unified FastAPI
      └── Knowledge Assistant ── FAISS + Qwen/Ollama
 ```
 
-The public deployment runs as one Railway service. The heavier RAG runtime is optional.
+The application can be run locally using Docker Compose. The heavier RAG runtime is optional.
 
 ## Evaluation discipline
 
@@ -76,7 +74,7 @@ Synthetic datasets are explicitly labeled as synthetic and are used to demonstra
 | Reproducibility | deterministic splits · committed metrics · Makefile |
 | RAG | pinned embedding revision · citations · abstention calibration |
 
-The web demo and benchmark evidence are kept separate: reported metrics come from committed evaluation artifacts, not from interactive demo fits.
+The local web demo and benchmark evidence are kept separate: reported metrics come from committed evaluation artifacts, not from interactive demo fits.
 
 ## Repository map
 
