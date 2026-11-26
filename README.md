@@ -3,6 +3,8 @@
 [![Portfolio CI](https://github.com/Davidkaaa33/ML-projects/actions/workflows/ci.yml/badge.svg)](https://github.com/Davidkaaa33/ML-projects/actions/workflows/ci.yml)
 [![RAG Retrieval Evaluation](https://github.com/Davidkaaa33/ML-projects/actions/workflows/rag-evaluation.yml/badge.svg)](https://github.com/Davidkaaa33/ML-projects/actions/workflows/rag-evaluation.yml)
 
+**Resume:** [English (PDF)](David_Danielian_CV_EN_v2.pdf) · [Русский (PDF)](David_Danielian_CV_RU_v2.pdf)
+
 ## ML Systems Lab
 
 Five independently evaluated ML systems packaged behind one FastAPI + React product.
